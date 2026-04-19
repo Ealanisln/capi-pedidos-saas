@@ -1,7 +1,7 @@
 ﻿import { PrinterArea } from "@prisma/client";
 import { requireAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { createCategoryAction, deleteCategoryAction, updateCategoryAction } from "../../actions";
+import { assignCategoryPrinterStationAction, createCategoryAction, deleteCategoryAction, updateCategoryAction } from "../../actions";
 
 const printerAreaLabel: Record<PrinterArea, string> = {
   GENERAL: "General",
@@ -14,7 +14,12 @@ export default async function CategoriesPage() {
   const session = await requireAuthSession();
   const categories = await prisma.category.findMany({
     where: { tenantId: session.user.tenantId },
+    include: { printerStation: true },
     orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+  });
+  const stations = await prisma.printerStation.findMany({
+    where: { tenantId: session.user.tenantId, isActive: true },
+    orderBy: [{ area: "asc" }, { name: "asc" }],
   });
 
   return (
@@ -59,10 +64,10 @@ export default async function CategoriesPage() {
                     <p className="text-xs text-slate-500">{category.slug}</p>
                   </div>
                   <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">
-                    Imprime en: {printerAreaLabel[category.printerArea]}
+                    Imprime en: {category.printerStation?.name ?? printerAreaLabel[category.printerArea]}
                   </span>
                 </div>
-                <div className="mt-2 flex flex-wrap gap-2">
+                <div className="mt-2 grid gap-2">
                   <form action={updateCategoryAction} className="grid w-full gap-2 md:grid-cols-[1fr_180px_auto]">
                     <input type="hidden" name="categoryId" value={category.id} />
                     <input
@@ -77,6 +82,20 @@ export default async function CategoriesPage() {
                     </select>
                     <button className="rounded-lg bg-slate-900 px-3 py-1 text-sm text-white">
                       Guardar
+                    </button>
+                  </form>
+                  <form action={assignCategoryPrinterStationAction} className="grid w-full gap-2 md:grid-cols-[1fr_auto]">
+                    <input type="hidden" name="categoryId" value={category.id} />
+                    <select name="printerStationId" defaultValue={category.printerStationId ?? ""} className="rounded-lg border border-slate-300 px-2 py-1 text-sm">
+                      <option value="">Usar área: {printerAreaLabel[category.printerArea]}</option>
+                      {stations.map((station) => (
+                        <option key={station.id} value={station.id}>
+                          {station.name} · {printerAreaLabel[station.area]}{station.deviceName ? ` · ${station.deviceName}` : ""}
+                        </option>
+                      ))}
+                    </select>
+                    <button className="rounded-lg border border-slate-300 px-3 py-1 text-sm font-bold text-slate-700">
+                      Asignar estación
                     </button>
                   </form>
                   <form action={deleteCategoryAction}>
@@ -94,3 +113,4 @@ export default async function CategoriesPage() {
     </div>
   );
 }
+

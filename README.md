@@ -1,4 +1,4 @@
-﻿# 🍽️ Capi Pedidos SaaS
+# 🍽️ Capi Pedidos SaaS
 
 ![Arquitectura de Capi](./docs/assets/arquitectura.svg)
 
@@ -52,7 +52,9 @@ Capi busca ordenar ese flujo sin obligar al restaurante a instalar una app pesad
 | 🛒 Carrito | El cliente arma pedido y lo envía a WhatsApp. |
 | 🧾 Pedidos | El restaurante recibe órdenes con datos y estatus. |
 | 🍳 Cocina | Monitor de comandas activas por estado. |
-| 💵 Caja | Cobros, métodos de pago y cortes diarios opcionales. |
+| 💵 Caja | Cajas configurables, cobros, precorte, movimientos y cortes diarios opcionales. |
+| 🧑‍🍳 Comandero | Meseros, mesas y flujo de precuenta preparado por plan. |
+| 🖨️ Impresión | Tickets de venta/producción y estaciones por cocina, barra, caja o general. |
 | 🧑‍💼 Super admin | Alta de negocios, planes, vigencias y demos. |
 | 🎨 Temas | Apariencia pública configurable por giro. |
 | 📊 Dashboard | Ventas, pedidos, productos populares y operación. |
@@ -87,8 +89,11 @@ Capi busca ordenar ese flujo sin obligar al restaurante a instalar una app pesad
 | Modificadores avanzados | ❌ | ✅ | ✅ |
 | Búsqueda/filtros | ❌ | ✅ | ✅ |
 | Analytics | ❌ | ✅ | ✅ |
-| Monitor de cocina | ❌ | ✅ | ✅ |
-| Caja diaria opcional | ❌ | ✅ | ✅ |
+| Monitor de cocina | Básico | ✅ | ✅ |
+| Caja diaria opcional | 1 caja | 3 cajas | Hasta 8 cajas |
+| Meseros/comandero | 2 meseros | 8 meseros | 30 meseros |
+| Mesas configurables | 10 mesas | 35 mesas | 120 mesas |
+| Estaciones de impresión | 3 estaciones | 6 estaciones | 12 estaciones |
 
 ---
 
@@ -104,6 +109,16 @@ Capi busca ordenar ese flujo sin obligar al restaurante a instalar una app pesad
 | Pizza del Barrio | `/pizza_barrio` | Pro | Pizzería |
 
 Los usuarios demo se generan desde variables de entorno. No se publican contraseñas reales en el repositorio.
+
+Cada demo también crea datos operativos para probar sin inventar nada manualmente:
+
+| Módulo demo | Qué incluye |
+|---|---|
+| Mesas | Lite con 10 mesas, Pro con 15 en Taquería Don José y Enterprise con más capacidad. |
+| Meseros | Usuarios con rol `MESERO`; Taquería Don José incluye 7 meseros demo. |
+| Caja | Cajas según plan, turno abierto, movimientos, propinas y precorte. |
+| Impresión | Estaciones para caja, cocina caliente, barra de bebidas e impresora general. |
+| Ventas | Dos meses de pedidos, pagos, cancelaciones, pedidos por cobrar y precuentas. |
 
 ---
 

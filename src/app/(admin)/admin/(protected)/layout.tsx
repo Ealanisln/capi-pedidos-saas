@@ -29,13 +29,15 @@ export default async function AdminLayout({
   const remainingDays = daysUntil(tenant?.contractEndAt);
   const links = [
     { href: "/admin", label: "Inicio" },
-    { href: "/admin/categories", label: "Categorías" },
-    { href: "/admin/products", label: "Productos" },
-    { href: "/admin/orders", label: "Pedidos" },
-    { href: "/admin/kitchen", label: "Cocina" },
-    { href: "/admin/cash", label: "Caja" },
-    { href: "/admin/print", label: "Impresión" },
-    { href: "/admin/settings", label: "Configuración" },
+    { href: "/admin/categorias", label: "Categorías" },
+    { href: "/admin/productos", label: "Productos" },
+    { href: "/admin/pedidos", label: "Pedidos" },
+    { href: "/admin/cocina", label: "Cocina" },
+    { href: "/admin/caja", label: "Caja" },
+    { href: "/admin/mesas", label: "Mesas" },
+    { href: "/admin/meseros", label: "Meseros" },
+    { href: "/admin/impresion", label: "Impresión" },
+    { href: "/admin/configuracion", label: "Configuración" },
     ...(session.user.role === UserRole.SUPER_ADMIN
       ? [{ href: "/admin/tenants", label: "Negocios SaaS" }]
       : []),

@@ -4,6 +4,7 @@ import { requireAuthSession } from "@/lib/auth";
 import { buildTicketPath } from "@/lib/print-jobs";
 import { formatNumber } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
+import { createPrinterStationAction, updatePrinterStationAction } from "../../actions";
 
 const statusLabel: Record<PrintJobStatus, string> = {
   PENDING: "Pendiente",
@@ -33,12 +34,14 @@ const areaLabel: Record<PrinterArea, string> = {
   CAJA: "Caja",
 };
 
+const areaOptions = Object.values(PrinterArea);
+
 export default async function PrintPage() {
   const session = await requireAuthSession();
-  const [tenant, jobs, counts] = await Promise.all([
+  const [tenant, jobs, counts, stations] = await Promise.all([
     prisma.tenant.findUnique({
       where: { id: session.user.tenantId },
-      select: { slug: true, businessName: true },
+      select: { slug: true, businessName: true, version: true },
     }),
     prisma.printJob.findMany({
       where: { tenantId: session.user.tenantId },
@@ -59,6 +62,10 @@ export default async function PrintPage() {
       by: ["status"],
       where: { tenantId: session.user.tenantId },
       _count: { _all: true },
+    }),
+    prisma.printerStation.findMany({
+      where: { tenantId: session.user.tenantId },
+      orderBy: [{ area: "asc" }, { createdAt: "asc" }],
     }),
   ]);
 
@@ -100,6 +107,60 @@ export default async function PrintPage() {
         <div className="mt-4 rounded-2xl bg-white/70 p-4 font-mono text-xs text-amber-950">
           GET /api/print/jobs?tenantSlug={tenant?.slug ?? "mi_negocio"}&area=COCINA<br />
           Authorization: Bearer TU_PRINT_BRIDGE_TOKEN
+        </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h3 className="text-xl font-black text-slate-950">Estaciones de impresión</h3>
+            <p className="mt-1 text-sm text-slate-600">
+              Configura impresoras por área. Si solo tienes una impresora, deja el mismo nombre o deja vacío para usar la predeterminada.
+            </p>
+          </div>
+          <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">
+            Plan {tenant?.version ?? "LITE"}
+          </span>
+        </div>
+
+        <form action={createPrinterStationAction} className="mt-5 grid gap-3 rounded-3xl bg-slate-50 p-4 md:grid-cols-[1fr_160px_1fr_auto_auto]">
+          <input name="name" placeholder="Nombre: Cocina caliente" className="rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
+          <select name="area" defaultValue="COCINA" className="rounded-2xl border border-slate-300 px-4 py-3 text-sm">
+            {areaOptions.map((area) => (
+              <option key={area} value={area}>{areaLabel[area]}</option>
+            ))}
+          </select>
+          <input name="deviceName" placeholder="Nombre exacto de impresora (opcional)" className="rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
+          <label className="flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-bold text-slate-700">
+            <input type="checkbox" name="isDefault" /> Predeterminada
+          </label>
+          <button className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-black text-white">Agregar</button>
+        </form>
+
+        <div className="mt-5 grid gap-3">
+          {stations.length === 0 ? (
+            <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">Aún no hay estaciones configuradas.</p>
+          ) : (
+            stations.map((station) => (
+              <form key={station.id} action={updatePrinterStationAction} className="grid gap-3 rounded-3xl border border-slate-200 bg-white p-4 md:grid-cols-[1fr_150px_1fr_auto_auto_auto]">
+                <input type="hidden" name="stationId" value={station.id} />
+                <input name="name" defaultValue={station.name} className="rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
+                <select name="area" defaultValue={station.area} className="rounded-2xl border border-slate-300 px-4 py-3 text-sm">
+                  {areaOptions.map((area) => (
+                    <option key={area} value={area}>{areaLabel[area]}</option>
+                  ))}
+                </select>
+                <input name="deviceName" defaultValue={station.deviceName ?? ""} placeholder="Impresora Windows" className="rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
+                <label className="flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700">
+                  <input type="checkbox" name="isDefault" defaultChecked={station.isDefault} /> Default
+                </label>
+                <label className="flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700">
+                  <input type="checkbox" name="isActive" defaultChecked={station.isActive} /> Activa
+                </label>
+                <button className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-black text-white">Guardar</button>
+              </form>
+            ))
+          )}
         </div>
       </section>
 

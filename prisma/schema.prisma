@@ -11,6 +11,9 @@ datasource db {
 enum UserRole {
   SUPER_ADMIN
   ADMIN
+  CAJERO
+  MESERO
+  COCINA
   STAFF
 }
 
@@ -65,6 +68,38 @@ enum PaymentMethod {
   OTRO
 }
 
+enum CashSessionStatus {
+  ABIERTA
+  CERRADA
+}
+
+enum CashMovementType {
+  ENTRADA
+  SALIDA
+  RETIRO
+  GASTO
+  ADELANTO
+  PAGO_PROVEEDOR
+  PROPINA
+  AJUSTE
+}
+
+enum TableStatus {
+  LIBRE
+  OCUPADA
+  PIDIENDO
+  EN_COCINA
+  POR_COBRAR
+  PAGADA
+  LIMPIEZA
+}
+
+enum OrderLockStatus {
+  ABIERTA
+  PRECUENTA
+  BLOQUEADA
+}
+
 enum PrinterArea {
   GENERAL
   COCINA
@@ -91,32 +126,42 @@ enum PrintJobStatus {
 }
 
 model Tenant {
-  id                 String     @id @default(cuid())
-  slug               String     @unique
+  id                 String           @id @default(cuid())
+  slug               String           @unique
   name               String
-  subdomain          String?    @unique
-  customDomain       String?    @unique
+  subdomain          String?          @unique
+  customDomain       String?          @unique
   businessName       String
   whatsapp           String
-  version            Version    @default(LITE)
-  contractStartAt    DateTime   @default(now())
+  version            Version          @default(LITE)
+  contractStartAt    DateTime         @default(now())
   contractEndAt      DateTime?
-  isDemo             Boolean    @default(false)
-  demoResetEveryDays Int        @default(5)
+  isDemo             Boolean          @default(false)
+  demoResetEveryDays Int              @default(5)
   demoLastResetAt    DateTime?
   demoNextResetAt    DateTime?
-  currency           String     @default("MXN")
-  timezone           String     @default("America/Cancun")
-  isActive           Boolean    @default(true)
+  currency           String           @default("MXN")
+  timezone           String           @default("America/Cancun")
+  isActive           Boolean          @default(true)
+  maxCashDrawers     Int              @default(1)
+  maxWaiters         Int              @default(2)
+  maxTables          Int              @default(10)
+  allowWaiterCharge  Boolean          @default(false)
   users              User[]
   categories         Category[]
   products           Product[]
   orders             Order[]
   cashCuts           CashCut[]
+  cashDrawers        CashDrawer[]
+  cashSessions       CashSession[]
+  cashMovements      CashMovement[]
+  orderPayments      OrderPayment[]
+  diningTables       DiningTable[]
+  printerStations    PrinterStation[]
   printJobs          PrintJob[]
   settings           Settings?
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 }
 
 model CashCut {
@@ -141,32 +186,101 @@ model CashCut {
   @@index([closedAt])
 }
 
+model CashDrawer {
+  id        String        @id @default(cuid())
+  tenantId  String
+  tenant    Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name      String
+  slug      String
+  isActive  Boolean       @default(true)
+  sessions  CashSession[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+model CashSession {
+  id             String            @id @default(cuid())
+  tenantId       String
+  tenant         Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  drawerId       String
+  drawer         CashDrawer        @relation(fields: [drawerId], references: [id], onDelete: Restrict)
+  openedById     String?
+  openedBy       User?             @relation("CashSessionOpenedBy", fields: [openedById], references: [id], onDelete: SetNull)
+  closedById     String?
+  closedBy       User?             @relation("CashSessionClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
+  status         CashSessionStatus @default(ABIERTA)
+  openingAmount  Decimal           @default(0) @db.Decimal(10, 2)
+  countedAmount  Decimal?          @db.Decimal(10, 2)
+  expectedAmount Decimal?          @db.Decimal(10, 2)
+  difference     Decimal?          @db.Decimal(10, 2)
+  openedAt       DateTime          @default(now())
+  closedAt       DateTime?
+  notes          String?
+  movements      CashMovement[]
+  payments       OrderPayment[]
+
+  @@index([tenantId])
+  @@index([drawerId])
+  @@index([status])
+  @@index([openedAt])
+}
+
+model CashMovement {
+  id            String           @id @default(cuid())
+  tenantId      String
+  tenant        Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  cashSessionId String
+  cashSession   CashSession      @relation(fields: [cashSessionId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type          CashMovementType
+  amount        Decimal          @db.Decimal(10, 2)
+  reason        String
+  category      String?
+  createdAt     DateTime         @default(now())
+
+  @@index([tenantId])
+  @@index([cashSessionId])
+  @@index([type])
+  @@index([createdAt])
+}
+
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  name         String?
-  passwordHash String
-  role         UserRole @default(ADMIN)
-  tenantId     String
-  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                 String         @id @default(cuid())
+  email              String         @unique
+  name               String?
+  passwordHash       String
+  role               UserRole       @default(ADMIN)
+  tenantId           String
+  tenant             Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  openedCashSessions CashSession[]  @relation("CashSessionOpenedBy")
+  closedCashSessions CashSession[]  @relation("CashSessionClosedBy")
+  cashMovements      CashMovement[]
+  orderPayments      OrderPayment[]
+  assignedOrders     Order[]        @relation("OrderAssignedUser")
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 
   @@index([tenantId])
 }
 
 model Category {
-  id          String      @id @default(cuid())
-  name        String
-  slug        String
-  position    Int         @default(0)
-  printerArea PrinterArea @default(COCINA)
-  isActive    Boolean     @default(true)
-  tenantId    String
-  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  products    Product[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id               String          @id @default(cuid())
+  name             String
+  slug             String
+  position         Int             @default(0)
+  printerArea      PrinterArea     @default(COCINA)
+  printerStationId String?
+  printerStation   PrinterStation? @relation(fields: [printerStationId], references: [id], onDelete: SetNull)
+  isActive         Boolean         @default(true)
+  tenantId         String
+  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  products         Product[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
   @@unique([tenantId, slug])
   @@index([tenantId])
@@ -197,58 +311,134 @@ model Product {
 }
 
 model Order {
-  id             String         @id @default(cuid())
-  orderNumber    String         @unique
+  id             String          @id @default(cuid())
+  orderNumber    String          @unique
   customerName   String?
   customerPhone  String?
   customerNotes  String?
-  subtotal       Decimal        @db.Decimal(10, 2)
-  total          Decimal        @db.Decimal(10, 2)
-  status         OrderStatus    @default(PENDING)
-  serviceType    ServiceType    @default(RECOGER)
+  subtotal       Decimal         @db.Decimal(10, 2)
+  total          Decimal         @db.Decimal(10, 2)
+  status         OrderStatus     @default(PENDING)
+  serviceType    ServiceType     @default(RECOGER)
   tableName      String?
-  paymentStatus  PaymentStatus  @default(PENDIENTE)
+  paymentStatus  PaymentStatus   @default(PENDIENTE)
   paymentMethod  PaymentMethod?
-  amountReceived Decimal?       @db.Decimal(10, 2)
-  changeDue      Decimal?       @db.Decimal(10, 2)
+  amountReceived Decimal?        @db.Decimal(10, 2)
+  changeDue      Decimal?        @db.Decimal(10, 2)
   paidAt         DateTime?
-  whatsappSent   Boolean        @default(false)
+  whatsappSent   Boolean         @default(false)
   whatsappSentAt DateTime?
   tenantId       String
-  tenant         Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  assignedUserId String?
+  assignedUser   User?           @relation("OrderAssignedUser", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  tableId        String?
+  table          DiningTable?    @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  lockStatus     OrderLockStatus @default(ABIERTA)
+  lockedAt       DateTime?
+  lockedReason   String?
   items          OrderItem[]
+  payments       OrderPayment[]
   printJobs      PrintJob[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   @@index([tenantId])
   @@index([status])
   @@index([paymentStatus])
+  @@index([tableId])
+  @@index([assignedUserId])
   @@index([createdAt])
 }
 
+model OrderPayment {
+  id             String        @id @default(cuid())
+  tenantId       String
+  tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  orderId        String
+  order          Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  cashSessionId  String?
+  cashSession    CashSession?  @relation(fields: [cashSessionId], references: [id], onDelete: SetNull)
+  userId         String?
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  method         PaymentMethod
+  amount         Decimal       @db.Decimal(10, 2)
+  amountReceived Decimal?      @db.Decimal(10, 2)
+  changeDue      Decimal?      @db.Decimal(10, 2)
+  reference      String?
+  tipAmount      Decimal       @default(0) @db.Decimal(10, 2)
+  createdAt      DateTime      @default(now())
+
+  @@index([tenantId])
+  @@index([orderId])
+  @@index([cashSessionId])
+  @@index([method])
+}
+
+model DiningTable {
+  id             String      @id @default(cuid())
+  tenantId       String
+  tenant         Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name           String
+  slug           String
+  area           String?
+  capacity       Int         @default(4)
+  status         TableStatus @default(LIBRE)
+  currentOrderId String?
+  orders         Order[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([status])
+}
+
 model PrintJob {
-  id        String         @id @default(cuid())
+  id        String          @id @default(cuid())
   tenantId  String
-  tenant    Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant    Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   orderId   String
-  order     Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order     Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  stationId String?
+  station   PrinterStation? @relation(fields: [stationId], references: [id], onDelete: SetNull)
   type      PrintJobType
   area      PrinterArea?
-  status    PrintJobStatus @default(PENDING)
-  attempts  Int            @default(0)
+  status    PrintJobStatus  @default(PENDING)
+  attempts  Int             @default(0)
   claimedAt DateTime?
   printedAt DateTime?
   lastError String?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 
   @@index([tenantId])
   @@index([orderId])
   @@index([status])
   @@index([type])
   @@index([area])
+  @@index([stationId])
   @@index([createdAt])
+}
+
+model PrinterStation {
+  id         String      @id @default(cuid())
+  tenantId   String
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name       String
+  slug       String
+  area       PrinterArea
+  deviceName String?
+  isDefault  Boolean     @default(false)
+  isActive   Boolean     @default(true)
+  categories Category[]
+  printJobs  PrintJob[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([area])
 }
 
 model OrderItem {

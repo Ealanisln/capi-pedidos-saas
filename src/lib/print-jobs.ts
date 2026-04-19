@@ -8,6 +8,11 @@ const productionAreas = new Set<PrinterArea>([
   PrinterArea.CAJA,
 ]);
 
+type ProductionTarget = {
+  area: PrinterArea;
+  stationId: string | null;
+};
+
 export async function createProductionPrintJobs(orderId: string) {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
@@ -25,20 +30,31 @@ export async function createProductionPrintJobs(orderId: string) {
   if (!order) return;
 
   const areas = new Set<PrinterArea>();
+  const targets = new Map<string, ProductionTarget>();
   order.items.forEach((item) => {
     const area = item.product?.category.printerArea ?? PrinterArea.COCINA;
-    if (productionAreas.has(area)) areas.add(area);
+    if (!productionAreas.has(area)) return;
+    const stationId = item.product?.category.printerStationId ?? null;
+    const key = `${area}:${stationId ?? "sin_estacion"}`;
+    targets.set(key, { area, stationId });
+    areas.add(area);
   });
 
-  if (areas.size === 0) areas.add(PrinterArea.COCINA);
+  if (targets.size === 0) {
+    targets.set(`${PrinterArea.COCINA}:sin_estacion`, {
+      area: PrinterArea.COCINA,
+      stationId: null,
+    });
+  }
 
-  for (const area of areas) {
+  for (const target of targets.values()) {
     const existing = await prisma.printJob.findFirst({
       where: {
         orderId: order.id,
         tenantId: order.tenantId,
         type: PrintJobType.PRODUCTION,
-        area,
+        area: target.area,
+        stationId: target.stationId,
         status: { in: [PrintJobStatus.PENDING, PrintJobStatus.CLAIMED, PrintJobStatus.PRINTED] },
       },
       select: { id: true },
@@ -47,13 +63,14 @@ export async function createProductionPrintJobs(orderId: string) {
     if (!existing) {
       await prisma.printJob.create({
         data: {
-          tenantId: order.tenantId,
-          orderId: order.id,
-          type: PrintJobType.PRODUCTION,
-          area,
-        },
-      });
-    }
+            tenantId: order.tenantId,
+            orderId: order.id,
+            type: PrintJobType.PRODUCTION,
+            area: target.area,
+            stationId: target.stationId,
+          },
+        });
+      }
   }
 }
 

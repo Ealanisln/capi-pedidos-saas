@@ -1,6 +1,7 @@
-import { PrismaClient, PublicTemplate, UserRole, Version } from "@prisma/client";
+import { PrismaClient, PrinterArea, PublicTemplate, TableStatus, UserRole, Version } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { resetDemoTenantData } from "../src/lib/demo-reset";
+import { applyPlanLimits, planLimits } from "../src/lib/plan-limits";
 
 const prisma = new PrismaClient();
 
@@ -103,6 +104,7 @@ async function ensureTenant(options: {
       businessName: options.businessName,
       whatsapp: options.whatsapp,
       version: options.version,
+      ...applyPlanLimits(options.version),
       isDemo: options.isDemo ?? false,
       demoResetEveryDays: options.isDemo ? 5 : 0,
       contractStartAt,
@@ -116,6 +118,7 @@ async function ensureTenant(options: {
       businessName: options.businessName,
       whatsapp: options.whatsapp,
       version: options.version,
+      ...applyPlanLimits(options.version),
       isDemo: options.isDemo ?? false,
       demoResetEveryDays: options.isDemo ? 5 : 0,
       contractStartAt,
@@ -222,6 +225,141 @@ async function ensureUser(options: {
   });
 }
 
+async function ensureOperationalDemoData(options: {
+  tenantId: string;
+  slug: string;
+  version: Version;
+  demoEmailDomain: string;
+  demoPassword: string;
+}) {
+  const limits = planLimits(options.version);
+  const drawerCount = Math.min(limits.cashDrawers, options.version === Version.ENTERPRISE ? 5 : limits.cashDrawers);
+  const waiterCount = options.slug === "taqueria_don_jose"
+    ? 7
+    : options.version === Version.LITE
+      ? 2
+      : options.version === Version.ENTERPRISE
+        ? 10
+        : 5;
+  const tableCount = options.slug === "taqueria_don_jose"
+    ? 15
+    : options.version === Version.LITE
+      ? 10
+      : options.version === Version.ENTERPRISE
+        ? 30
+        : 15;
+
+  const baseStationSpecs = [
+    { name: "Caja principal", slug: "caja_principal", area: PrinterArea.CAJA, isDefault: true },
+    { name: "Cocina caliente", slug: "cocina_caliente", area: PrinterArea.COCINA, isDefault: true },
+    { name: "Barra de bebidas", slug: "barra_bebidas", area: PrinterArea.BARRA, isDefault: true },
+    { name: "Impresora general", slug: "impresora_general", area: PrinterArea.GENERAL, isDefault: false },
+  ];
+  const stationSpecs = baseStationSpecs.slice(0, limits.printerStations);
+  const stationSlugs = stationSpecs.map((station) => station.slug);
+
+  const stations = new Map<PrinterArea, string>();
+  for (const station of stationSpecs) {
+    const dbStation = await prisma.printerStation.upsert({
+      where: { tenantId_slug: { tenantId: options.tenantId, slug: station.slug } },
+      update: {
+        name: station.name,
+        area: station.area,
+        isDefault: station.isDefault,
+        isActive: true,
+      },
+      create: {
+        tenantId: options.tenantId,
+        name: station.name,
+        slug: station.slug,
+        area: station.area,
+        isDefault: station.isDefault,
+        isActive: true,
+      },
+    });
+    if (!stations.has(station.area)) stations.set(station.area, dbStation.id);
+  }
+
+  await prisma.printerStation.deleteMany({
+    where: {
+      tenantId: options.tenantId,
+      slug: { notIn: stationSlugs },
+    },
+  });
+
+  const categories = await prisma.category.findMany({ where: { tenantId: options.tenantId } });
+  for (const category of categories) {
+    const isDrink = /bebida|cafe|cafÒ©|coctel|limónada|naranjada|refresco|agua/i.test(`${category.name} ${category.slug}`);
+    const area = isDrink ? PrinterArea.BARRA : PrinterArea.COCINA;
+    await prisma.category.update({
+      where: { id: category.id },
+      data: {
+        printerArea: area,
+        printerStationId: stations.get(area) ?? null,
+      },
+    });
+  }
+
+  for (let index = 1; index <= drawerCount; index += 1) {
+    await prisma.cashDrawer.upsert({
+      where: { tenantId_slug: { tenantId: options.tenantId, slug: `caja_${index}` } },
+      update: {
+        name: index === 1 ? "Caja principal" : `Caja ${index}`,
+        isActive: true,
+      },
+      create: {
+        tenantId: options.tenantId,
+        name: index === 1 ? "Caja principal" : `Caja ${index}`,
+        slug: `caja_${index}`,
+        isActive: true,
+      },
+    });
+  }
+
+  const waiterNames = [
+    "Ana LÒ³pez",
+    "Luis HernÒ¡ndez",
+    "MarÒ­a GonzÒ¡lez",
+    "Carlos Chan",
+    "Diana MÒ©ndez",
+    "JosÒ© Pech",
+    "Fernanda Ruiz",
+    "Roberto Torres",
+    "Paola SÒ¡nchez",
+    "Miguel Castillo",
+  ];
+  for (let index = 1; index <= waiterCount; index += 1) {
+    await ensureUser({
+      email: `mesero${index}.${options.slug}@${options.demoEmailDomain}`,
+      password: options.demoPassword,
+      name: waiterNames[index - 1] ?? `Mesero ${index}`,
+      role: UserRole.MESERO,
+      tenantId: options.tenantId,
+    });
+  }
+
+  for (let index = 1; index <= tableCount; index += 1) {
+    const area = index <= Math.ceil(tableCount * 0.65) ? "SalÒ³n" : index <= Math.ceil(tableCount * 0.85) ? "Terraza" : "Barra";
+    await prisma.diningTable.upsert({
+      where: { tenantId_slug: { tenantId: options.tenantId, slug: `mesa_${index}` } },
+      update: {
+        name: `Mesa ${index}`,
+        area,
+        capacity: index % 5 === 0 ? 6 : index % 4 === 0 ? 2 : 4,
+        status: TableStatus.LIBRE,
+      },
+      create: {
+        tenantId: options.tenantId,
+        name: `Mesa ${index}`,
+        slug: `mesa_${index}`,
+        area,
+        capacity: index % 5 === 0 ? 6 : index % 4 === 0 ? 2 : 4,
+        status: TableStatus.LIBRE,
+      },
+    });
+  }
+}
+
 async function main() {
   const rootEmail = (process.env.SEED_ADMIN_EMAIL ?? "superadmin@example.com")
     .trim()
@@ -244,8 +382,8 @@ async function main() {
         slug: "especialidades",
         products: [
           {
-            name: "Quesadilla de maiz",
-            slug: "quesadilla_maiz",
+            name: "Quesadilla de maíz",
+            slug: "quesadilla_maíz",
             description: "Hecha al comal con tortilla artesanal.",
             price: 45,
           },
@@ -270,7 +408,7 @@ async function main() {
     isDemo: true,
     publicTemplate: PublicTemplate.CLASICO,
     contractEndDaysFromNow: 5,
-    welcomeMessage: "Sabor casero todos los dias. Pide rapido y confirma por WhatsApp.",
+    welcomeMessage: "Sabor casero todos los días. Pide rápido y confirma por WhatsApp.",
     facebookUrl: "https://facebook.com/fondalupita.demo",
     categories: [
       {
@@ -302,7 +440,7 @@ async function main() {
           { name: "Agua de jamaica", slug: "agua_jamaica", description: "500 ml.", price: 28 },
           { name: "Agua de horchata", slug: "agua_horchata", description: "500 ml.", price: 28 },
           { name: "Refresco de lata", slug: "refresco_lata", description: "355 ml.", price: 24 },
-          { name: "Cafe de olla", slug: "cafe_olla", description: "Taza grande.", price: 32 },
+          { name: "Café de olla", slug: "cafe_olla", description: "Taza grande.", price: 32 },
         ],
       },
     ],
@@ -310,7 +448,7 @@ async function main() {
 
   const proTenant = await ensureTenant({
     slug: "taqueria_don_jose",
-    businessName: "Taqueria Don Jose",
+    businessName: "Taquería Don Jose",
     whatsapp: "529842222222",
     version: Version.PRO,
     isDemo: true,
@@ -325,7 +463,7 @@ async function main() {
         name: "Tacos",
         slug: "tacos",
         products: [
-          { name: "Taco al pastor", slug: "taco_pastor", description: "Con pina, cebolla y cilantro.", price: 24, imageUrl: "https://picsum.photos/seed/taco_pastor/200/200" },
+          { name: "Taco al pastor", slug: "taco_pastor", description: "Con piña, cebolla y cilantro.", price: 24, imageUrl: "https://picsum.photos/seed/taco_pastor/200/200" },
           { name: "Taco de suadero", slug: "taco_suadero", description: "A fuego lento estilo CDMX.", price: 27, imageUrl: "https://picsum.photos/seed/taco_suadero/200/200" },
           { name: "Taco de bistec", slug: "taco_bistec", description: "Con guacamole casero.", price: 28, imageUrl: "https://picsum.photos/seed/taco_bistec/200/200" },
           { name: "Taco de campechano", slug: "taco_campechano", description: "Bistec y chorizo.", price: 29, imageUrl: "https://picsum.photos/seed/taco_campechano/200/200" },
@@ -349,8 +487,8 @@ async function main() {
         name: "Complementos",
         slug: "complementos",
         products: [
-          { name: "Frijoles charros", slug: "frijoles_charros", description: "Porcion individual.", price: 35, imageUrl: "https://picsum.photos/seed/frijoles_charros/200/200" },
-          { name: "Papas a la francesa", slug: "papas_francesa", description: "Con sazon de la casa.", price: 49, imageUrl: "https://picsum.photos/seed/papas_francesa/200/200" },
+          { name: "Frijoles charros", slug: "frijoles_charros", description: "Porción individual.", price: 35, imageUrl: "https://picsum.photos/seed/frijoles_charros/200/200" },
+          { name: "Papas a la francesa", slug: "papas_francesa", description: "Con sazón de la casa.", price: 49, imageUrl: "https://picsum.photos/seed/papas_francesa/200/200" },
           { name: "Volcan de pastor", slug: "volcan_pastor", description: "Tortilla dorada con queso.", price: 41, imageUrl: "https://picsum.photos/seed/volcan_pastor/200/200" },
           { name: "Naranjada mineral", slug: "naranjada_mineral", description: "Vaso 600 ml.", price: 34, imageUrl: "https://picsum.photos/seed/naranjada_mineral/200/200" },
         ],
@@ -377,7 +515,7 @@ async function main() {
         products: [
           { name: "Guacamole tatemado", slug: "guacamole_tatemado", description: "Con totopos horneados.", price: 120, imageUrl: "https://picsum.photos/seed/guacamole_tatemado/200/200" },
           { name: "Esquites premium", slug: "esquites_premium", description: "Con mayo de chipotle.", price: 65, imageUrl: "https://picsum.photos/seed/esquites_premium/200/200" },
-          { name: "Tostadas de atun", slug: "tostadas_atun", description: "2 piezas con ajonjoli.", price: 130, imageUrl: "https://picsum.photos/seed/tostadas_atun/200/200" },
+          { name: "Tostadas de atún", slug: "tostadas_atún", description: "2 piezas con ajonjoli.", price: 130, imageUrl: "https://picsum.photos/seed/tostadas_atún/200/200" },
           { name: "Queso fundido mixto", slug: "queso_fundido_mixto", description: "Con chorizo y champinon.", price: 145, imageUrl: "https://picsum.photos/seed/queso_fundido_mixto/200/200" },
         ],
       },
@@ -386,11 +524,11 @@ async function main() {
         slug: "platos_fuertes",
         products: [
           { name: "Arrachera al carbon", slug: "arrachera_carbon", description: "350 g con papas gajo.", price: 295, imageUrl: "https://picsum.photos/seed/arrachera_carbon/200/200" },
-          { name: "Salmón al mezcal", slug: "salmon_mezcal", description: "Con pure de coliflor.", price: 320, imageUrl: "https://picsum.photos/seed/salmon_mezcal/200/200" },
+          { name: "Salmón al mezcal", slug: "salmon_mezcal", description: "Con puré de coliflor.", price: 320, imageUrl: "https://picsum.photos/seed/salmon_mezcal/200/200" },
           { name: "Rib eye norteño", slug: "ribeye_norteno", description: "Con mantequilla de ajo.", price: 390, imageUrl: "https://picsum.photos/seed/ribeye_norteno/200/200" },
           { name: "Mole de la casa", slug: "mole_casa", description: "Pechuga de pollo y arroz.", price: 210, imageUrl: "https://picsum.photos/seed/mole_casa/200/200" },
           { name: "Enchiladas suizas", slug: "enchiladas_suizas", description: "Gratinadas al horno.", price: 185, imageUrl: "https://picsum.photos/seed/enchiladas_suizas/200/200" },
-          { name: "Chamorro glaseado", slug: "chamorro_glaseado", description: "Coccion lenta 8 horas.", price: 265, imageUrl: "https://picsum.photos/seed/chamorro_glaseado/200/200" },
+          { name: "Chamorro glaseado", slug: "chamorro_glaseado", description: "Cocción lenta 8 horas.", price: 265, imageUrl: "https://picsum.photos/seed/chamorro_glaseado/200/200" },
           { name: "Lasaña poblana", slug: "lasana_poblana", description: "Con rajas y elote.", price: 190, imageUrl: "https://picsum.photos/seed/lasana_poblana/200/200" },
         ],
       },
@@ -398,10 +536,10 @@ async function main() {
         name: "Postres y bebidas",
         slug: "postres_bebidas",
         products: [
-          { name: "Flan de cajeta", slug: "flan_cajeta", description: "Porcion individual.", price: 75, imageUrl: "https://picsum.photos/seed/flan_cajeta/200/200" },
+          { name: "Flan de cajeta", slug: "flan_cajeta", description: "Porción individual.", price: 75, imageUrl: "https://picsum.photos/seed/flan_cajeta/200/200" },
           { name: "Pastel de elote", slug: "pastel_elote", description: "Con helado de vainilla.", price: 82, imageUrl: "https://picsum.photos/seed/pastel_elote/200/200" },
-          { name: "Cafe de altura", slug: "cafe_altura", description: "Tostado medio.", price: 48, imageUrl: "https://picsum.photos/seed/cafe_altura/200/200" },
-          { name: "Limonada pepino", slug: "limonada_pepino", description: "Natural 700 ml.", price: 52, imageUrl: "https://picsum.photos/seed/limonada_pepino/200/200" },
+          { name: "Café de altura", slug: "cafe_altura", description: "Tostado medio.", price: 48, imageUrl: "https://picsum.photos/seed/cafe_altura/200/200" },
+          { name: "Limonada pepino", slug: "limónada_pepino", description: "Natural 700 ml.", price: 52, imageUrl: "https://picsum.photos/seed/limónada_pepino/200/200" },
           { name: "Naranjada de temporada", slug: "naranjada_temporada", description: "700 ml.", price: 52, imageUrl: "https://picsum.photos/seed/naranjada_temporada/200/200" },
         ],
       },
@@ -425,8 +563,8 @@ async function main() {
         slug: "tostadas",
         products: [
           { name: "Tostada de ceviche", slug: "tostada_ceviche", description: "Pescado fresco, pepino y salsa de la casa.", price: 58, imageUrl: "https://picsum.photos/seed/tostada_ceviche/200/200" },
-          { name: "Tostada de atun", slug: "tostada_atun", description: "Atun sellado con ajonjoli.", price: 82, imageUrl: "https://picsum.photos/seed/tostada_atun_faro/200/200" },
-          { name: "Tostada campechana", slug: "tostada_campechana", description: "Pulpo, camaron y pescado.", price: 96, imageUrl: "https://picsum.photos/seed/tostada_campechana_faro/200/200" },
+          { name: "Tostada de atún", slug: "tostada_atún", description: "Atún sellado con ajonjoli.", price: 82, imageUrl: "https://picsum.photos/seed/tostada_atún_faro/200/200" },
+          { name: "Tostada campechana", slug: "tostada_campechana", description: "Pulpo, camarón y pescado.", price: 96, imageUrl: "https://picsum.photos/seed/tostada_campechana_faro/200/200" },
           { name: "Tostada de aguachile", slug: "tostada_aguachile", description: "Verde, rojo o negro.", price: 88, imageUrl: "https://picsum.photos/seed/tostada_aguachile/200/200" },
         ],
       },
@@ -434,9 +572,9 @@ async function main() {
         name: "Cocteles",
         slug: "cocteles",
         products: [
-          { name: "Coctel de camaron", slug: "coctel_camaron", description: "Chico, mediano o grande.", price: 135, imageUrl: "https://picsum.photos/seed/coctel_camaron/200/200" },
+          { name: "Coctel de camarón", slug: "coctel_camarón", description: "Chico, mediano o grande.", price: 135, imageUrl: "https://picsum.photos/seed/coctel_camarón/200/200" },
           { name: "Vuelve a la vida", slug: "vuelve_vida", description: "Mariscos mixtos en salsa especial.", price: 165, imageUrl: "https://picsum.photos/seed/vuelve_vida/200/200" },
-          { name: "Aguachile verde", slug: "aguachile_verde", description: "Camaron, pepino, cebolla morada y limon.", price: 170, imageUrl: "https://picsum.photos/seed/aguachile_verde/200/200" },
+          { name: "Aguachile verde", slug: "aguachile_verde", description: "Camarón, pepino, cebolla morada y limón.", price: 170, imageUrl: "https://picsum.photos/seed/aguachile_verde/200/200" },
           { name: "Ceviche familiar", slug: "ceviche_familiar", description: "Ideal para compartir.", price: 260, imageUrl: "https://picsum.photos/seed/ceviche_familiar/200/200" },
         ],
       },
@@ -444,7 +582,7 @@ async function main() {
         name: "Bebidas",
         slug: "bebidas_mar",
         products: [
-          { name: "Limonada mineral", slug: "limonada_mineral", description: "Vaso grande.", price: 45, imageUrl: "https://picsum.photos/seed/limonada_mineral/200/200" },
+          { name: "Limonada mineral", slug: "limónada_mineral", description: "Vaso grande.", price: 45, imageUrl: "https://picsum.photos/seed/limónada_mineral/200/200" },
           { name: "Agua de mango", slug: "agua_mango", description: "Natural de temporada.", price: 38, imageUrl: "https://picsum.photos/seed/agua_mango/200/200" },
           { name: "Clamato preparado", slug: "clamato_preparado", description: "Con escarchado y salsas.", price: 65, imageUrl: "https://picsum.photos/seed/clamato_preparado/200/200" },
           { name: "Refresco botella", slug: "refresco_botella", description: "600 ml.", price: 32, imageUrl: "https://picsum.photos/seed/refresco_botella/200/200" },
@@ -455,23 +593,23 @@ async function main() {
 
   const cafeTenant = await ensureTenant({
     slug: "cafe_amanecer",
-    businessName: "Cafe Amanecer",
+    businessName: "Café Amanecer",
     whatsapp: "529845555555",
     version: Version.PRO,
     isDemo: true,
     publicTemplate: PublicTemplate.CAFETERIA,
     contractEndDaysFromNow: 9,
-    welcomeMessage: "Cafe, pan dulce y desayunos para empezar bien el dia.",
+    welcomeMessage: "Café, pan dulce y desayunos para empezar bien el dia.",
     instagramUrl: "https://instagram.com/cafeamanecer.demo",
     categories: [
       {
-        name: "Cafe",
+        name: "Café",
         slug: "cafe",
         products: [
-          { name: "Americano", slug: "americano", description: "Cafe de altura tostado medio.", price: 42, imageUrl: "https://picsum.photos/seed/americano/200/200" },
+          { name: "Americano", slug: "americano", description: "Café de altura tostado medio.", price: 42, imageUrl: "https://picsum.photos/seed/americano/200/200" },
           { name: "Latte vainilla", slug: "latte_vainilla", description: "Espresso con leche y vainilla.", price: 68, imageUrl: "https://picsum.photos/seed/latte_vainilla/200/200" },
-          { name: "Capuchino", slug: "capuchino", description: "Clasico con espuma cremosa.", price: 62, imageUrl: "https://picsum.photos/seed/capuchino/200/200" },
-          { name: "Cold brew", slug: "cold_brew", description: "Extraccion fria 18 horas.", price: 74, imageUrl: "https://picsum.photos/seed/cold_brew/200/200" },
+          { name: "Capuchino", slug: "capuchino", description: "Clásico con espuma cremosa.", price: 62, imageUrl: "https://picsum.photos/seed/capuchino/200/200" },
+          { name: "Cold brew", slug: "cold_brew", description: "Extracción fria 18 horas.", price: 74, imageUrl: "https://picsum.photos/seed/cold_brew/200/200" },
         ],
       },
       {
@@ -488,7 +626,7 @@ async function main() {
         name: "Panaderia",
         slug: "panaderia",
         products: [
-          { name: "Concha vainilla", slug: "concha_vainilla", description: "Horneada cada manana.", price: 28, imageUrl: "https://picsum.photos/seed/concha_vainilla/200/200" },
+          { name: "Concha vainilla", slug: "concha_vainilla", description: "Horneada cada mañana.", price: 28, imageUrl: "https://picsum.photos/seed/concha_vainilla/200/200" },
           { name: "Rol de canela", slug: "rol_canela", description: "Con glaseado ligero.", price: 46, imageUrl: "https://picsum.photos/seed/rol_canela/200/200" },
           { name: "Pan de elote", slug: "pan_elote", description: "Rebanada individual.", price: 52, imageUrl: "https://picsum.photos/seed/pan_elote/200/200" },
           { name: "Galleta chispas", slug: "galleta_chispas", description: "Suave por dentro.", price: 35, imageUrl: "https://picsum.photos/seed/galleta_chispas/200/200" },
@@ -513,9 +651,9 @@ async function main() {
         slug: "pizzas",
         products: [
           { name: "Pizza pepperoni", slug: "pizza_pepperoni", description: "Queso mozzarella y pepperoni.", price: 169, imageUrl: "https://picsum.photos/seed/pizza_pepperoni/200/200" },
-          { name: "Pizza mexicana", slug: "pizza_mexicana", description: "Chorizo, jalapeno, cebolla y frijol.", price: 185, imageUrl: "https://picsum.photos/seed/pizza_mexicana/200/200" },
-          { name: "Pizza hawaiana", slug: "pizza_hawaiana", description: "Jamon, pina y extra queso.", price: 175, imageUrl: "https://picsum.photos/seed/pizza_hawaiana/200/200" },
-          { name: "Pizza vegetariana", slug: "pizza_vegetariana", description: "Champinon, pimiento, aceituna y cebolla.", price: 179, imageUrl: "https://picsum.photos/seed/pizza_vegetariana/200/200" },
+          { name: "Pizza mexicana", slug: "pizza_mexicana", description: "Chorizo, jalapeño, cebolla y frijol.", price: 185, imageUrl: "https://picsum.photos/seed/pizza_mexicana/200/200" },
+          { name: "Pizza hawaiana", slug: "pizza_hawaiana", description: "Jamón, piña y extra queso.", price: 175, imageUrl: "https://picsum.photos/seed/pizza_hawaiana/200/200" },
+          { name: "Pizza vegetariana", slug: "pizza_vegetariana", description: "Champiñón, pimiento, aceituna y cebolla.", price: 179, imageUrl: "https://picsum.photos/seed/pizza_vegetariana/200/200" },
         ],
       },
       {
@@ -524,7 +662,7 @@ async function main() {
         products: [
           { name: "Spaghetti bolognesa", slug: "spaghetti_bolognesa", description: "Salsa de carne de la casa.", price: 135, imageUrl: "https://picsum.photos/seed/spaghetti_bolognesa/200/200" },
           { name: "Fettuccine Alfredo", slug: "fettuccine_alfredo", description: "Cremoso con parmesano.", price: 145, imageUrl: "https://picsum.photos/seed/fettuccine_alfredo/200/200" },
-          { name: "Lasana de carne", slug: "lasana_carne", description: "Porcion individual.", price: 155, imageUrl: "https://picsum.photos/seed/lasana_carne/200/200" },
+          { name: "Lasana de carne", slug: "lasana_carne", description: "Porción individual.", price: 155, imageUrl: "https://picsum.photos/seed/lasana_carne/200/200" },
           { name: "Penne arrabbiata", slug: "penne_arrabbiata", description: "Salsa roja picante.", price: 128, imageUrl: "https://picsum.photos/seed/penne_arrabbiata/200/200" },
         ],
       },
@@ -565,7 +703,7 @@ async function main() {
         maxSelection: 3,
         modifiers: [
           { name: "Queso extra", price: 12 },
-          { name: "Piña extra", price: 5 },
+          { name: "PiÒ±a extra", price: 5 },
           { name: "Salsa especial", price: 4 },
         ],
       },
@@ -624,7 +762,7 @@ async function main() {
     ingredients: ["arrachera", "chimichurri", "papa gajo", "ensalada"],
     groups: [
       {
-        name: "Punto de coccion",
+        name: "Punto de cocción",
         isRequired: true,
         allowMultiple: false,
         minSelection: 1,
@@ -642,7 +780,7 @@ async function main() {
         maxSelection: 2,
         modifiers: [
           { name: "Espárragos", price: 25 },
-          { name: "Pure trufado", price: 30 },
+          { name: "Puré trufado", price: 30 },
           { name: "Queso fundido", price: 20 },
         ],
       },
@@ -657,7 +795,7 @@ async function main() {
     "chamorro_glaseado",
     "lasana_poblana",
     "guacamole_tatemado",
-    "tostadas_atun",
+    "tostadas_atún",
     "queso_fundido_mixto",
     "pastel_elote",
     "flan_cajeta",
@@ -667,16 +805,16 @@ async function main() {
     await setProductEnhancements({
       tenantId: enterpriseTenant.id,
       productSlug: slug,
-      ingredients: ["ingredientes premium", "toque de la casa", "guarnicion especial"],
+      ingredients: ["ingredientes premium", "toque de la casa", "guarnición especial"],
       groups: [
         {
-          name: "Presentacion",
+          name: "Presentación",
           isRequired: true,
           allowMultiple: false,
           minSelection: 1,
           maxSelection: 1,
           modifiers: [
-            { name: "Estandar", price: 0 },
+            { name: "Estándar", price: 0 },
             { name: "Executive", price: 35 },
           ],
         },
@@ -730,7 +868,7 @@ async function main() {
   await ensureUser({
     email: `demo.cafe@${demoEmailDomain}`,
     password: demoPassword,
-    name: "Demo Cafe",
+    name: "Demo Café",
     role: UserRole.ADMIN,
     tenantId: cafeTenant.id,
   });
@@ -741,6 +879,49 @@ async function main() {
     name: "Demo Pizza",
     role: UserRole.ADMIN,
     tenantId: pizzaTenant.id,
+  });
+
+  await ensureOperationalDemoData({
+    tenantId: liteTenant.id,
+    slug: "fonda_lupita",
+    version: Version.LITE,
+    demoEmailDomain,
+    demoPassword,
+  });
+  await ensureOperationalDemoData({
+    tenantId: proTenant.id,
+    slug: "taqueria_don_jose",
+    version: Version.PRO,
+    demoEmailDomain,
+    demoPassword,
+  });
+  await ensureOperationalDemoData({
+    tenantId: enterpriseTenant.id,
+    slug: "grupo_nopal",
+    version: Version.ENTERPRISE,
+    demoEmailDomain,
+    demoPassword,
+  });
+  await ensureOperationalDemoData({
+    tenantId: seafoodTenant.id,
+    slug: "mariscos_el_faro",
+    version: Version.PRO,
+    demoEmailDomain,
+    demoPassword,
+  });
+  await ensureOperationalDemoData({
+    tenantId: cafeTenant.id,
+    slug: "cafe_amanecer",
+    version: Version.PRO,
+    demoEmailDomain,
+    demoPassword,
+  });
+  await ensureOperationalDemoData({
+    tenantId: pizzaTenant.id,
+    slug: "pizza_barrio",
+    version: Version.PRO,
+    demoEmailDomain,
+    demoPassword,
   });
 
   await resetDemoTenantData(prisma, "fonda_lupita");
@@ -760,3 +941,4 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+

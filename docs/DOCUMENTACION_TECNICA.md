@@ -1,10 +1,10 @@
-﻿# Documentación técnica - Capi Pedidos SaaS
+# Documentación técnica - Capi Pedidos SaaS
 
 ![Arquitectura de Capi](./assets/arquitectura.svg)
 
 Fecha de actualización: abril 2026  
 Estado: base colaborativa pública, preparada para despliegues propios.  
-Versión documental: v0.093.
+Versión documental: v0.097.
 
 ---
 
@@ -89,6 +89,9 @@ Regla crítica:
 |---|---|
 | `SUPER_ADMIN` | Administra tenants, planes, vigencias y demos. |
 | `ADMIN` | Opera un negocio específico. |
+| `CAJERO` | Rol preparado para cobros, apertura/cierre y movimientos de caja. |
+| `MESERO` | Rol preparado para comandero, mesas, precuentas y pedidos de salón. |
+| `COCINA` | Rol preparado para monitor de producción. |
 | `STAFF` | Reservado para futuras funciones de personal. |
 
 ---
@@ -107,6 +110,13 @@ Regla crítica:
 | `Order` | Pedido |
 | `OrderItem` | Producto dentro del pedido |
 | `CashCut` | Corte de caja |
+| `CashDrawer` | Caja/cajón configurable por negocio |
+| `CashSession` | Turno de caja abierto o cerrado |
+| `CashMovement` | Entrada, salida, gasto, retiro, adelanto o ajuste |
+| `OrderPayment` | Pago registrado por pedido; permite base para pago mixto |
+| `DiningTable` | Mesa física del restaurante |
+| `PrinterStation` | Estación/impresora lógica para cocina, barra, caja o general |
+| `PrintJob` | Trabajo de impresión tomado por el puente local |
 | `Settings` | Configuración del negocio y tema público |
 
 ---
@@ -121,6 +131,10 @@ Regla crítica:
 | `ServiceType` | `MOSTRADOR`, `MESA`, `RECOGER`, `DOMICILIO` |
 | `PaymentStatus` | `PENDIENTE`, `PAGADO`, `CANCELADO` |
 | `PaymentMethod` | `EFECTIVO`, `TARJETA`, `TRANSFERENCIA`, `OTRO` |
+| `CashSessionStatus` | `ABIERTA`, `CERRADA` |
+| `CashMovementType` | `ENTRADA`, `SALIDA`, `RETIRO`, `GASTO`, `ADELANTO`, `PAGO_PROVEEDOR`, `PROPINA`, `AJUSTE` |
+| `TableStatus` | `LIBRE`, `OCUPADA`, `PIDIENDO`, `EN_COCINA`, `POR_COBRAR`, `PAGADA`, `LIMPIEZA` |
+| `OrderLockStatus` | `ABIERTA`, `PRECUENTA`, `BLOQUEADA` |
 
 ---
 
@@ -138,7 +152,12 @@ Regla crítica:
 | `/admin/orders` | Pedidos y analytics | Autenticado |
 | `/admin/kitchen` | Monitor de cocina | Autenticado |
 | `/admin/cash` | Caja diaria | Autenticado |
+| `/admin/caja` | Alias en español de caja | Autenticado |
+| `/admin/mesas` | Mapa de mesas/comandero | Autenticado |
+| `/admin/meseros` | Equipo de meseros | Autenticado |
 | `/admin/settings` | Ajustes del negocio | Autenticado |
+| `/admin/configuracion` | Alias en español de ajustes | Autenticado |
+| `/admin/impresion` | Alias en español de impresión | Autenticado |
 | `/admin/tenants` | Gestión SaaS de negocios | Solo `SUPER_ADMIN` |
 | `/api/orders` | Crear pedido | Público |
 | `/api/cron/reset-demos` | Reiniciar demos vencidas | Protegido por `CRON_SECRET` |
@@ -157,8 +176,11 @@ Regla crítica:
 | Modificadores avanzados | ❌ | ✅ | ✅ |
 | Búsqueda/filtros | ❌ | ✅ | ✅ |
 | Analytics | ❌ | ✅ | ✅ |
-| Monitor de cocina | ❌ | ✅ | ✅ |
-| Caja diaria | ❌ | ✅ | ✅ |
+| Monitor de cocina | Básico | ✅ | ✅ |
+| Caja diaria | 1 caja | 3 cajas | Hasta 8 cajas |
+| Meseros/comandero | 2 meseros | 8 meseros | 30 meseros |
+| Mesas | 10 | 35 | 120 |
+| Estaciones de impresión | 3 | 6 | 12 |
 | Dashboard enriquecido | Básico | ✅ | ✅ |
 | Gestión SaaS multi-cliente | Super admin | Super admin | Super admin |
 
@@ -412,3 +434,94 @@ El ticket de venta muestra:
 - Total en letras formato Mexico.
 - Metodo de pago en espanol.
 - Recibido y cambio cuando el pago fue en efectivo.
+
+## 19. Caja, comandero y estaciones por plan (v0.097)
+
+La versión `v0.097` conecta la operación diaria del restaurante con límites reales por plan.
+
+### Límites técnicos
+
+Los límites viven en `src/lib/plan-limits.ts` y se aplican al crear o cambiar plan desde super administrador.
+
+| Plan | Cajas | Meseros | Mesas | Estaciones de impresión |
+| --- | ---: | ---: | ---: | ---: |
+| Lite | 1 | 2 | 10 | 3 |
+| Pro | 3 | 8 | 35 | 6 |
+| Enterprise | 8 | 30 | 120 | 12 |
+
+### Flujo de caja
+
+| Modelo | Propósito |
+| --- | --- |
+| `CashDrawer` | Caja física o lógica, por ejemplo `Caja principal` o `Caja barra`. |
+| `CashSession` | Turno abierto/cerrado por caja. Guarda fondo inicial, contado, esperado y diferencia. |
+| `CashMovement` | Movimientos manuales: gasto, retiro, adelanto, entrada, pago a proveedor o ajuste. |
+| `OrderPayment` | Pago aplicado a un pedido. La estructura soporta varios pagos por pedido para pago mixto. |
+
+Flujo recomendado:
+
+1. Caja abre turno con fondo inicial.
+2. Pedidos se cobran con efectivo como método predeterminado.
+3. Si hay pago en efectivo, se captura recibido y se calcula cambio.
+4. Se registran entradas/salidas del cajón durante el turno.
+5. El precorte muestra efectivo, tarjeta, transferencia, salidas, entradas y efectivo esperado.
+6. Al cerrar caja se crea un `CashCut` histórico.
+
+### Flujo de precuenta
+
+`Order.lockStatus` controla la cuenta:
+
+| Estado | Uso |
+| --- | --- |
+| `ABIERTA` | Pedido editable/operativo. |
+| `PRECUENTA` | Precuenta impresa; la cuenta queda marcada como esperando cobro. |
+| `BLOQUEADA` | Cuenta cobrada. |
+
+La fase actual permite reabrir desde caja. La siguiente mejora recomendada es exigir permiso granular por rol para reapertura cuando haya precuenta impresa.
+
+### Comandero
+
+`DiningTable` y `UserRole.MESERO` dejan preparada la operación de salón:
+
+- Lite: hasta 2 meseros y 10 mesas.
+- Pro: operación completa para restaurantes medianos.
+- Enterprise: estructura preparada para operación más grande y futuras sucursales.
+
+Las rutas iniciales son:
+
+| Ruta | Uso |
+| --- | --- |
+| `/admin/mesas` | Ver mesas, estatus, pedido activo y mesero asignado. |
+| `/admin/meseros` | Ver meseros configurados y pedidos asignados. |
+
+### Estaciones de impresión
+
+`PrinterStation` permite que un restaurante empiece con una sola impresora y después escale.
+
+Ejemplos:
+
+| Categoría | Estación sugerida | Impresora física posible |
+| --- | --- | --- |
+| Tacos, tortas, cocina | Cocina caliente | Epson TM-T20 cocina |
+| Bebidas, café, bar | Barra de bebidas | Impresora barra |
+| Ticket final | Caja principal | Impresora caja |
+| Respaldo | Impresora general | Misma impresora de caja |
+
+Si el negocio sólo tiene una impresora, puede registrar una estación general o usar el mismo `deviceName` en varias estaciones.
+
+### Seeds demo
+
+`prisma/seed.ts` y `src/lib/demo-reset.ts` ahora crean:
+
+- Mesas demo.
+- Meseros demo.
+- Cajas según plan.
+- Estaciones de impresión.
+- Dos meses de ventas.
+- Pedidos con diferentes estados.
+- Pagos, propinas, cambios y referencias.
+- Precuentas y cuentas bloqueadas.
+- Movimientos de caja.
+- Cortes históricos.
+
+Esto permite probar la operación sin capturar datos manuales después de correr `npm run db:seed`.

@@ -7,6 +7,9 @@ import {
   Prisma,
   PrinterArea,
   PublicTemplate,
+  CashMovementType,
+  CashSessionStatus,
+  OrderLockStatus,
   TicketPaperWidth,
   UserRole,
   Version,
@@ -14,6 +17,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { requireAuthSession } from "@/lib/auth";
 import { resetDemoTenantData } from "@/lib/demo-reset";
+import { applyPlanLimits, planLimits } from "@/lib/plan-limits";
 import { createSalePrintJob } from "@/lib/print-jobs";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/tenant";
@@ -57,6 +61,75 @@ function parsePrinterArea(value: string): PrinterArea {
 function parseTicketPaperWidth(value: string): TicketPaperWidth {
   if (value === "MM_58") return TicketPaperWidth.MM_58;
   return TicketPaperWidth.MM_80;
+}
+
+function parseCashMovementType(value: string): CashMovementType {
+  if (value === "ENTRADA") return CashMovementType.ENTRADA;
+  if (value === "RETIRO") return CashMovementType.RETIRO;
+  if (value === "GASTO") return CashMovementType.GASTO;
+  if (value === "ADELANTO") return CashMovementType.ADELANTO;
+  if (value === "PAGO_PROVEEDOR") return CashMovementType.PAGO_PROVEEDOR;
+  if (value === "PROPINA") return CashMovementType.PROPINA;
+  if (value === "AJUSTE") return CashMovementType.AJUSTE;
+  return CashMovementType.SALIDA;
+}
+
+async function getActiveCashSession(tenantId: string, drawerId?: string) {
+  return prisma.cashSession.findFirst({
+    where: {
+      tenantId,
+      status: CashSessionStatus.ABIERTA,
+      ...(drawerId ? { drawerId } : {}),
+    },
+    orderBy: { openedAt: "desc" },
+  });
+}
+
+async function calculateCashSessionPreview(cashSessionId: string) {
+  const [session, payments, movements] = await Promise.all([
+    prisma.cashSession.findUnique({
+      where: { id: cashSessionId },
+    }),
+    prisma.orderPayment.findMany({
+      where: { cashSessionId },
+    }),
+    prisma.cashMovement.findMany({
+      where: { cashSessionId },
+    }),
+  ]);
+
+  if (!session) return null;
+
+  const totals = {
+    cash: 0,
+    card: 0,
+    transfer: 0,
+    other: 0,
+    tips: 0,
+    entries: 0,
+    exits: 0,
+  };
+
+  payments.forEach((payment) => {
+    const amount = Number(payment.amount);
+    totals.tips += Number(payment.tipAmount);
+    if (payment.method === PaymentMethod.EFECTIVO) totals.cash += amount;
+    else if (payment.method === PaymentMethod.TARJETA) totals.card += amount;
+    else if (payment.method === PaymentMethod.TRANSFERENCIA) totals.transfer += amount;
+    else totals.other += amount;
+  });
+
+  movements.forEach((movement) => {
+    const amount = Number(movement.amount);
+    if (movement.type === CashMovementType.ENTRADA || movement.type === CashMovementType.AJUSTE) {
+      totals.entries += amount;
+    } else {
+      totals.exits += amount;
+    }
+  });
+
+  const expected = Number(session.openingAmount) + totals.cash + totals.entries - totals.exits;
+  return { session, payments, movements, totals, expected };
 }
 
 export async function createCategoryAction(formData: FormData) {
@@ -119,6 +192,104 @@ export async function deleteCategoryAction(formData: FormData) {
   });
 
   revalidatePath("/admin/categories");
+}
+
+export async function createPrinterStationAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const name = String(formData.get("name") ?? "").trim();
+  const area = parsePrinterArea(String(formData.get("area") ?? "COCINA"));
+  const deviceName = String(formData.get("deviceName") ?? "").trim();
+  const isDefault = String(formData.get("isDefault") ?? "") === "on";
+  if (!name) return;
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: session.user.tenantId },
+    select: { version: true },
+  });
+  if (!tenant) return;
+
+  const count = await prisma.printerStation.count({
+    where: { tenantId: session.user.tenantId, isActive: true },
+  });
+  if (count >= planLimits(tenant.version).printerStations) return;
+
+  if (isDefault) {
+    await prisma.printerStation.updateMany({
+      where: { tenantId: session.user.tenantId, area },
+      data: { isDefault: false },
+    });
+  }
+
+  await prisma.printerStation.create({
+    data: {
+      tenantId: session.user.tenantId,
+      name,
+      slug: `${slugify(name)}-${Date.now().toString().slice(-4)}`,
+      area,
+      deviceName: deviceName || null,
+      isDefault,
+    },
+  });
+
+  revalidatePath("/admin/print");
+  revalidatePath("/admin/impresion");
+}
+
+export async function updatePrinterStationAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const stationId = String(formData.get("stationId") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const area = parsePrinterArea(String(formData.get("area") ?? "COCINA"));
+  const deviceName = String(formData.get("deviceName") ?? "").trim();
+  const isDefault = String(formData.get("isDefault") ?? "") === "on";
+  const isActive = String(formData.get("isActive") ?? "") === "on";
+  if (!stationId || !name) return;
+
+  if (isDefault) {
+    await prisma.printerStation.updateMany({
+      where: { tenantId: session.user.tenantId, area, id: { not: stationId } },
+      data: { isDefault: false },
+    });
+  }
+
+  await prisma.printerStation.updateMany({
+    where: { id: stationId, tenantId: session.user.tenantId },
+    data: {
+      name,
+      area,
+      deviceName: deviceName || null,
+      isDefault,
+      isActive,
+    },
+  });
+
+  revalidatePath("/admin/print");
+  revalidatePath("/admin/impresion");
+  revalidatePath("/admin/categories");
+}
+
+export async function assignCategoryPrinterStationAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const categoryId = String(formData.get("categoryId") ?? "");
+  const stationId = String(formData.get("printerStationId") ?? "");
+  if (!categoryId) return;
+
+  const station = stationId
+    ? await prisma.printerStation.findFirst({
+        where: { id: stationId, tenantId: session.user.tenantId },
+      })
+    : null;
+
+  await prisma.category.updateMany({
+    where: { id: categoryId, tenantId: session.user.tenantId },
+    data: {
+      printerStationId: station?.id ?? null,
+      ...(station ? { printerArea: station.area } : {}),
+    },
+  });
+
+  revalidatePath("/admin/categories");
+  revalidatePath("/admin/print");
 }
 
 export async function createProductAction(formData: FormData) {
@@ -380,6 +551,9 @@ export async function markOrderPaidAction(formData: FormData) {
   const orderId = String(formData.get("orderId") ?? "");
   const method = parsePaymentMethod(String(formData.get("paymentMethod") ?? "EFECTIVO"));
   const amountReceivedRaw = String(formData.get("amountReceived") ?? "").trim();
+  const cashSessionId = String(formData.get("cashSessionId") ?? "").trim();
+  const tipAmount = Math.max(0, Number(String(formData.get("tipAmount") ?? "0")) || 0);
+  const reference = String(formData.get("reference") ?? "").trim();
   if (!orderId) return;
 
   const order = await prisma.order.findFirst({
@@ -393,11 +567,22 @@ export async function markOrderPaidAction(formData: FormData) {
   if (!order) return;
 
   const total = Number(order.total);
+  const totalWithTip = total + tipAmount;
   const amountReceived =
     method === PaymentMethod.EFECTIVO && amountReceivedRaw
-      ? Math.max(Number(amountReceivedRaw) || 0, total)
-      : total;
-  const changeDue = method === PaymentMethod.EFECTIVO ? Math.max(amountReceived - total, 0) : 0;
+      ? Math.max(Number(amountReceivedRaw) || 0, totalWithTip)
+      : totalWithTip;
+  const changeDue = method === PaymentMethod.EFECTIVO ? Math.max(amountReceived - totalWithTip, 0) : 0;
+
+  const activeSession = cashSessionId
+    ? await prisma.cashSession.findFirst({
+        where: {
+          id: cashSessionId,
+          tenantId: session.user.tenantId,
+          status: CashSessionStatus.ABIERTA,
+        },
+      })
+    : await getActiveCashSession(session.user.tenantId);
 
   const result = await prisma.order.updateMany({
     where: {
@@ -409,11 +594,28 @@ export async function markOrderPaidAction(formData: FormData) {
       paymentMethod: method,
       amountReceived: new Prisma.Decimal(amountReceived),
       changeDue: new Prisma.Decimal(changeDue),
+      lockStatus: OrderLockStatus.BLOQUEADA,
+      lockedAt: new Date(),
+      lockedReason: "Cuenta cobrada",
       paidAt: new Date(),
     },
   });
 
   if (result.count > 0) {
+    await prisma.orderPayment.create({
+      data: {
+        tenantId: session.user.tenantId,
+        orderId,
+        cashSessionId: activeSession?.id ?? null,
+        userId: session.user.id,
+        method,
+        amount: new Prisma.Decimal(totalWithTip),
+        amountReceived: new Prisma.Decimal(amountReceived),
+        changeDue: new Prisma.Decimal(changeDue),
+        tipAmount: new Prisma.Decimal(tipAmount),
+        reference: reference || null,
+      },
+    });
     await createSalePrintJob(orderId);
   }
 
@@ -437,12 +639,59 @@ export async function markOrderUnpaidAction(formData: FormData) {
       paymentMethod: null,
       amountReceived: null,
       changeDue: null,
+      lockStatus: OrderLockStatus.ABIERTA,
+      lockedAt: null,
+      lockedReason: null,
       paidAt: null,
+    },
+  });
+
+  await prisma.orderPayment.deleteMany({
+    where: {
+      orderId,
+      tenantId: session.user.tenantId,
     },
   });
 
   revalidatePath("/admin/cash");
   revalidatePath("/admin/orders");
+}
+
+export async function lockOrderForPrecheckAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const orderId = String(formData.get("orderId") ?? "");
+  if (!orderId) return;
+
+  await prisma.order.updateMany({
+    where: { id: orderId, tenantId: session.user.tenantId },
+    data: {
+      lockStatus: OrderLockStatus.PRECUENTA,
+      lockedAt: new Date(),
+      lockedReason: "Precuenta impresa; esperando cobro",
+    },
+  });
+
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin/cash");
+}
+
+export async function unlockOrderAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const orderId = String(formData.get("orderId") ?? "");
+  const reason = String(formData.get("reason") ?? "").trim();
+  if (!orderId) return;
+
+  await prisma.order.updateMany({
+    where: { id: orderId, tenantId: session.user.tenantId },
+    data: {
+      lockStatus: OrderLockStatus.ABIERTA,
+      lockedAt: null,
+      lockedReason: reason || null,
+    },
+  });
+
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin/cash");
 }
 
 export async function createCashCutAction(formData: FormData) {
@@ -503,6 +752,142 @@ export async function createCashCutAction(formData: FormData) {
   revalidatePath("/admin");
 }
 
+export async function createCashDrawerAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return;
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: session.user.tenantId },
+    select: { version: true },
+  });
+  if (!tenant) return;
+
+  const count = await prisma.cashDrawer.count({
+    where: { tenantId: session.user.tenantId, isActive: true },
+  });
+  if (count >= planLimits(tenant.version).cashDrawers) return;
+
+  await prisma.cashDrawer.create({
+    data: {
+      tenantId: session.user.tenantId,
+      name,
+      slug: `${slugify(name)}-${Date.now().toString().slice(-4)}`,
+    },
+  });
+
+  revalidatePath("/admin/cash");
+  revalidatePath("/admin/caja");
+}
+
+export async function openCashSessionAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const drawerId = String(formData.get("drawerId") ?? "");
+  const openingAmount = Math.max(0, Number(String(formData.get("openingAmount") ?? "0")) || 0);
+  const notes = String(formData.get("notes") ?? "").trim();
+  if (!drawerId) return;
+
+  const drawer = await prisma.cashDrawer.findFirst({
+    where: { id: drawerId, tenantId: session.user.tenantId, isActive: true },
+  });
+  if (!drawer) return;
+
+  const active = await getActiveCashSession(session.user.tenantId, drawer.id);
+  if (active) return;
+
+  await prisma.cashSession.create({
+    data: {
+      tenantId: session.user.tenantId,
+      drawerId: drawer.id,
+      openedById: session.user.id,
+      openingAmount: new Prisma.Decimal(openingAmount),
+      notes: notes || null,
+    },
+  });
+
+  revalidatePath("/admin/cash");
+  revalidatePath("/admin/caja");
+}
+
+export async function createCashMovementAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const cashSessionId = String(formData.get("cashSessionId") ?? "");
+  const type = parseCashMovementType(String(formData.get("type") ?? "SALIDA"));
+  const amount = Math.max(0, Number(String(formData.get("amount") ?? "0")) || 0);
+  const reason = String(formData.get("reason") ?? "").trim();
+  const category = String(formData.get("category") ?? "").trim();
+  if (!cashSessionId || amount <= 0 || !reason) return;
+
+  const cashSession = await prisma.cashSession.findFirst({
+    where: {
+      id: cashSessionId,
+      tenantId: session.user.tenantId,
+      status: CashSessionStatus.ABIERTA,
+    },
+  });
+  if (!cashSession) return;
+
+  await prisma.cashMovement.create({
+    data: {
+      tenantId: session.user.tenantId,
+      cashSessionId: cashSession.id,
+      userId: session.user.id,
+      type,
+      amount: new Prisma.Decimal(amount),
+      reason,
+      category: category || null,
+    },
+  });
+
+  revalidatePath("/admin/cash");
+  revalidatePath("/admin/caja");
+}
+
+export async function closeCashSessionAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const cashSessionId = String(formData.get("cashSessionId") ?? "");
+  const countedAmount = Math.max(0, Number(String(formData.get("countedAmount") ?? "0")) || 0);
+  const notes = String(formData.get("notes") ?? "").trim();
+  if (!cashSessionId) return;
+
+  const preview = await calculateCashSessionPreview(cashSessionId);
+  if (!preview || preview.session.tenantId !== session.user.tenantId) return;
+
+  await prisma.cashSession.update({
+    where: { id: cashSessionId },
+    data: {
+      status: CashSessionStatus.CERRADA,
+      closedById: session.user.id,
+      closedAt: new Date(),
+      countedAmount: new Prisma.Decimal(countedAmount),
+      expectedAmount: new Prisma.Decimal(preview.expected),
+      difference: new Prisma.Decimal(countedAmount - preview.expected),
+      notes: notes || preview.session.notes,
+    },
+  });
+
+  await prisma.cashCut.create({
+    data: {
+      tenantId: session.user.tenantId,
+      openedAt: preview.session.openedAt,
+      closedAt: new Date(),
+      openingAmount: preview.session.openingAmount,
+      cashSales: new Prisma.Decimal(preview.totals.cash),
+      cardSales: new Prisma.Decimal(preview.totals.card),
+      transferSales: new Prisma.Decimal(preview.totals.transfer),
+      otherSales: new Prisma.Decimal(preview.totals.other),
+      expectedAmount: new Prisma.Decimal(preview.expected),
+      countedAmount: new Prisma.Decimal(countedAmount),
+      difference: new Prisma.Decimal(countedAmount - preview.expected),
+      notes: notes || null,
+    },
+  });
+
+  revalidatePath("/admin/cash");
+  revalidatePath("/admin/caja");
+  revalidatePath("/admin");
+}
+
 export async function createTenantAction(formData: FormData) {
   const session = await requireAuthSession();
   if (session.user.role !== UserRole.SUPER_ADMIN) return;
@@ -528,6 +913,7 @@ export async function createTenantAction(formData: FormData) {
       slug,
       whatsapp,
       version,
+      ...applyPlanLimits(version),
       contractStartAt,
       contractEndAt,
     },
@@ -634,6 +1020,7 @@ export async function updateTenantPlanAction(formData: FormData) {
     where: { id: tenantId },
     data: {
       version,
+      ...applyPlanLimits(version),
       ...(contractStartAt ? { contractStartAt } : {}),
       contractEndAt,
     },

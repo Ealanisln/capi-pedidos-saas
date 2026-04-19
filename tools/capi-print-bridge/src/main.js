@@ -146,7 +146,10 @@ async function processArea(config, area) {
     try {
       log(`Imprimiendo ${job.type === "SALE" ? "venta" : "producción"} ${job.order.orderNumber} en ${area}.`);
       const html = await fetchTicketHtml(job.ticketHtmlUrl, config.token);
-      await printHtml(html, target);
+      await printHtml(html, {
+        ...target,
+        printerName: job.deviceName || target.printerName,
+      });
       await updateJob(config, job.id, "PRINTED");
       log(`Impreso ${job.order.orderNumber} en ${area}.`);
     } catch (error) {

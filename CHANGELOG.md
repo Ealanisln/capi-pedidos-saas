@@ -1,5 +1,16 @@
-﻿# Changelog
+# Changelog
 
+## v0.097 - Caja operativa, comandero y demos enriquecidos
+
+- Límites reales por plan para cajas, meseros, mesas y estaciones de impresión.
+- Nuevos modelos operativos: cajas, turnos de caja, movimientos, pagos, mesas y estaciones de impresión.
+- Panel de caja con apertura, precorte, entradas/salidas, cobro, propinas, cambio y cierre.
+- Flujo de precuenta con bloqueo de cuenta esperando cobro y reapertura controlada desde caja.
+- Nuevas rutas en español México: `/admin/caja`, `/admin/mesas`, `/admin/meseros`, `/admin/impresion`, `/admin/categorias`, `/admin/productos`, `/admin/pedidos` y `/admin/configuracion`.
+- Configuración de estaciones de impresión por cocina, barra, caja o general.
+- Categorías pueden asignarse a una estación específica para imprimir producción en el lugar correcto.
+- Seeds demo con mesas, meseros, cajas, estaciones, dos meses de ventas, pagos, propinas, precuentas y movimientos.
+- Documentación técnica, README y manual de uso actualizados para colaboradores y agentes de IA.
 ## v0.096 - Puente local de impresion y tickets de caja
 
 - App local `Capi Print Bridge` basada en Electron para impresion silenciosa por caja, cocina, barra y general.

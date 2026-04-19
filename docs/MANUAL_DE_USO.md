@@ -1,4 +1,4 @@
-﻿# Manual de uso - Capi Pedidos SaaS
+# Manual de uso - Capi Pedidos SaaS
 
 Este manual explica como usar la plataforma desde tres perspectivas:
 
@@ -201,10 +201,15 @@ Modulo opcional. Sirve para negocios que no tienen POS o quieren control adicion
 
 Permite:
 
+- Crear cajas segun el plan contratado.
+- Abrir turno con fondo inicial.
 - Ver cobros del dia.
 - Marcar pedido como pagado.
-- Elegir metodo de pago.
-- Registrar corte de caja.
+- Elegir metodo de pago, con efectivo como opcion predeterminada.
+- Capturar monto recibido y ver cambio.
+- Registrar gastos, retiros, entradas, adelantos y pagos a proveedor.
+- Visualizar precorte antes de cerrar.
+- Cerrar caja y guardar corte.
 - Ver diferencias entre esperado y contado.
 
 Metodos de pago:
@@ -508,3 +513,83 @@ Al cobrar en efectivo, caja puede capturar el monto recibido. El ticket muestra:
 ### Botones manuales
 
 Aunque exista puente local, los botones manuales de ticket siguen disponibles como respaldo por si se acaba el papel, se desconecta la impresora o se necesita reimprimir.
+
+## 13. Mesas, meseros y precuenta
+
+Rutas:
+
+| Ruta | Uso |
+| --- | --- |
+| `/admin/mesas` | Ver mapa operativo de mesas. |
+| `/admin/meseros` | Ver personal con rol de mesero. |
+| `/admin/caja` | Alias en español para caja. |
+| `/admin/impresion` | Alias en español para impresión. |
+
+### Límites por plan
+
+| Plan | Meseros | Mesas | Cajas | Estaciones de impresión |
+| --- | ---: | ---: | ---: | ---: |
+| Lite | 2 | 10 | 1 | 3 |
+| Pro | 8 | 35 | 3 | 6 |
+| Enterprise | 30 | 120 | 8 | 12 |
+
+### Flujo recomendado con meseros
+
+1. El mesero levanta el pedido en mesa.
+2. El pedido se envía a cocina.
+3. Cocina imprime o visualiza sólo productos nuevos.
+4. Cuando el cliente pide cuenta, se imprime precuenta.
+5. La cuenta queda marcada como `Precuenta impresa; esperando cobro`.
+6. Caja cobra y genera ticket final.
+7. Si se necesita reabrir la cuenta, se hace desde caja con motivo.
+
+### Precuenta vs ticket final
+
+| Documento | Cuándo se usa |
+| --- | --- |
+| Precuenta | Antes de cobrar, para que el cliente revise su consumo. |
+| Ticket final | Después de cobrar, con método de pago, recibido y cambio si aplica. |
+
+## 14. Configuración de impresoras por estación
+
+Ruta: `/admin/impresion`
+
+El restaurante puede crear estaciones como:
+
+- Caja principal.
+- Cocina caliente.
+- Barra de bebidas.
+- Impresora general.
+- Bar.
+- Repostería.
+
+Ruta: `/admin/categorias`
+
+Cada categoría puede enviarse a una estación. Ejemplos:
+
+| Categoría | Estación |
+| --- | --- |
+| Tacos | Cocina caliente |
+| Tortas | Cocina caliente |
+| Refrescos | Barra de bebidas |
+| Cafés | Barra de bebidas |
+| Ticket de venta | Caja principal |
+
+Si el negocio tiene una sola impresora, puede usar el mismo nombre de impresora física en varias estaciones. Cuando compre más hardware, sólo cambia la estación desde el panel.
+
+## 15. Datos demo enriquecidos
+
+Al correr `npm run db:seed`, las demos quedan listas para enseñar y vender:
+
+- Productos mexicanos por giro.
+- Ingredientes y modificadores.
+- Mesas y meseros.
+- Cajas y turnos abiertos.
+- Estaciones de impresión.
+- Pedidos de dos meses.
+- Pedidos cancelados, pendientes, listos y pagados.
+- Propinas, cambios y referencias.
+- Precuentas y cuentas por cobrar.
+- Cortes históricos.
+
+Los tenants demo se reinician automáticamente según su configuración, normalmente cada 5 días, o manualmente desde el panel del super administrador.

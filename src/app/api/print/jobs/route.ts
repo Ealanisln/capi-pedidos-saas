@@ -55,6 +55,14 @@ export async function GET(request: Request) {
       ...(area ? { area } : {}),
     },
     include: {
+      station: {
+        select: {
+          id: true,
+          name: true,
+          area: true,
+          deviceName: true,
+        },
+      },
       order: {
         select: {
           id: true,
@@ -88,6 +96,8 @@ export async function GET(request: Request) {
       id: job.id,
       type: job.type,
       area: job.area,
+      station: job.station,
+      deviceName: job.station?.deviceName ?? null,
       status: PrintJobStatus.CLAIMED,
       order: job.order,
       ticketPath: buildTicketPath(job.orderId, job.type, job.area),
