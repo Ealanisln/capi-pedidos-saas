@@ -1,17 +1,47 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 
 type LoginFormProps = {
   initialEmail?: string;
+  demoKey?: string;
+  demoLabel?: string;
 };
 
-export function LoginForm({ initialEmail = "" }: LoginFormProps) {
+export function LoginForm({ initialEmail = "", demoKey, demoLabel }: LoginFormProps) {
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [autoDemoLoading, setAutoDemoLoading] = useState(Boolean(demoKey));
+  const [attemptedDemoLogin, setAttemptedDemoLogin] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!demoKey || attemptedDemoLogin) return;
+
+    async function loginDemo() {
+      setAttemptedDemoLogin(true);
+      setAutoDemoLoading(true);
+      setError(null);
+
+      const result = await signIn("demo", {
+        demo: demoKey,
+        redirect: false,
+        callbackUrl: "/admin",
+      });
+
+      if (result?.error) {
+        setError("No se pudo abrir el panel demo. Intenta con el acceso manual.");
+        setAutoDemoLoading(false);
+        return;
+      }
+
+      window.location.href = "/admin";
+    }
+
+    void loginDemo();
+  }, [attemptedDemoLogin, demoKey]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -32,6 +62,20 @@ export function LoginForm({ initialEmail = "" }: LoginFormProps) {
     }
 
     window.location.href = "/admin";
+  }
+
+  if (autoDemoLoading) {
+    return (
+      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-700" />
+        <p className="mt-4 text-sm font-black text-emerald-950">
+          Abriendo panel demo{demoLabel ? ` ${demoLabel}` : ""}...
+        </p>
+        <p className="mt-1 text-xs font-semibold text-emerald-800">
+          No necesitas contraseña para esta demostración.
+        </p>
+      </div>
+    );
   }
 
   return (

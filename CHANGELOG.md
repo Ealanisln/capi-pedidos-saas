@@ -1,5 +1,15 @@
 ﻿# Changelog
 
+## v0.093 - Documentación enriquecida y demos con acceso automático
+
+- README enriquecido para GitHub con iconos, tablas, diagramas y guía para principiantes.
+- Nuevas imágenes SVG para arquitectura, flujo de pedido y trabajo con agentes IA.
+- Nueva guía para vibecoding responsable.
+- Nueva guía para conectar Claude, Codex, Gemini, Copilot y otros agentes.
+- Archivos de contexto para `CODEX.md`, `GEMINI.md`, `CLAUDE.md` y Copilot.
+- Acceso automático a paneles demo desde links `/admin/login?demo=...`.
+- Proveedor NextAuth `demo` limitado a tenants marcados como demo y activos.
+- Login demo sin publicar ni autocompletar contraseñas.
 ## v0.092 - Publicacion inicial
 
 - Publicacion inicial del proyecto Capi Pedidos SaaS.
@@ -11,3 +21,4 @@
 - Seeds demo realistas para negocios de comida en Mexico.
 - Documentacion tecnica, manual de uso, guia de contribucion y seguridad.
 - Sanitizacion de credenciales para repositorio publico.
+

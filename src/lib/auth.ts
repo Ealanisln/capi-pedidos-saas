@@ -12,6 +12,25 @@ const credentialsSchema = z.object({
   password: z.string().min(8),
 });
 
+const demoSchema = z.object({
+  demo: z.string().trim().toLowerCase(),
+});
+
+const demoEmailDomain =
+  process.env.NEXT_PUBLIC_DEMO_EMAIL_DOMAIN ??
+  process.env.SEED_DEMO_EMAIL_DOMAIN ??
+  process.env.ROOT_DOMAIN ??
+  "example.com";
+
+const demoEmails: Record<string, string> = {
+  lite: `demo.lite@${demoEmailDomain}`,
+  pro: `demo.pro@${demoEmailDomain}`,
+  enterprise: `demo.enterprise@${demoEmailDomain}`,
+  mariscos: `demo.mariscos@${demoEmailDomain}`,
+  cafe: `demo.cafe@${demoEmailDomain}`,
+  pizza: `demo.pizza@${demoEmailDomain}`,
+};
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -21,6 +40,7 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     CredentialsProvider({
+      id: "credentials",
       name: "Credenciales",
       credentials: {
         email: { label: "Correo", type: "email" },
@@ -42,6 +62,41 @@ export const authOptions: NextAuthOptions = {
           user.passwordHash,
         );
         if (!passwordMatch) return null;
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name ?? user.email,
+          role: user.role,
+          tenantId: user.tenantId,
+        };
+      },
+    }),
+    CredentialsProvider({
+      id: "demo",
+      name: "Demo",
+      credentials: {
+        demo: { label: "Demo", type: "text" },
+      },
+      async authorize(credentials) {
+        const parsed = demoSchema.safeParse(credentials);
+        if (!parsed.success) return null;
+
+        const email = demoEmails[parsed.data.demo];
+        if (!email) return null;
+
+        const user = await prisma.user.findUnique({
+          where: { email },
+          include: {
+            tenant: {
+              select: {
+                isDemo: true,
+                isActive: true,
+              },
+            },
+          },
+        });
+        if (!user || !user.tenant.isDemo || !user.tenant.isActive) return null;
 
         return {
           id: user.id,

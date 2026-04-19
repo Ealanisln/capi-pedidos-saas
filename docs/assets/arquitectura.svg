@@ -1,0 +1,39 @@
+﻿<svg width="1200" height="520" viewBox="0 0 1200 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Arquitectura Capi Pedidos SaaS</title>
+  <desc id="desc">Diagrama visual de las capas de Capi: cliente, Next.js, autenticación, Prisma, PostgreSQL, WhatsApp y Vercel.</desc>
+  <rect width="1200" height="520" rx="36" fill="#fff7e8"/>
+  <circle cx="1040" cy="82" r="170" fill="#9cf2df" opacity="0.55"/>
+  <circle cx="120" cy="440" r="190" fill="#ffd166" opacity="0.55"/>
+  <rect x="70" y="64" width="1060" height="392" rx="30" fill="#13201d"/>
+  <text x="100" y="118" fill="#9cf2df" font-family="Arial, sans-serif" font-size="24" font-weight="700">Capi Pedidos SaaS</text>
+  <text x="100" y="152" fill="#ffffff" font-family="Arial, sans-serif" font-size="42" font-weight="800">Arquitectura general</text>
+  <g font-family="Arial, sans-serif" font-weight="700">
+    <rect x="100" y="210" width="180" height="108" rx="22" fill="#ffffff"/>
+    <text x="130" y="252" fill="#13201d" font-size="22">Cliente</text>
+    <text x="130" y="284" fill="#50635f" font-size="15">Menú público</text>
+    <text x="130" y="306" fill="#50635f" font-size="15">Carrito móvil</text>
+    <rect x="340" y="210" width="180" height="108" rx="22" fill="#9cf2df"/>
+    <text x="372" y="252" fill="#06332b" font-size="22">Next.js</text>
+    <text x="372" y="284" fill="#07594b" font-size="15">App Router</text>
+    <text x="372" y="306" fill="#07594b" font-size="15">API Routes</text>
+    <rect x="580" y="210" width="180" height="108" rx="22" fill="#ffe9a7"/>
+    <text x="612" y="252" fill="#3a2600" font-size="22">Prisma</text>
+    <text x="612" y="284" fill="#684600" font-size="15">ORM</text>
+    <text x="612" y="306" fill="#684600" font-size="15">TenantId</text>
+    <rect x="820" y="210" width="180" height="108" rx="22" fill="#ffb47d"/>
+    <text x="852" y="252" fill="#401500" font-size="22">PostgreSQL</text>
+    <text x="852" y="284" fill="#6e2600" font-size="15">Neon / Supabase</text>
+    <text x="852" y="306" fill="#6e2600" font-size="15">Datos SaaS</text>
+  </g>
+  <path d="M286 264H332" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <path d="M526 264H572" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <path d="M766 264H812" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <g font-family="Arial, sans-serif" font-weight="700">
+    <rect x="220" y="360" width="210" height="58" rx="18" fill="#ffffff" opacity="0.13"/>
+    <text x="252" y="397" fill="#ffffff" font-size="17">NextAuth + JWT</text>
+    <rect x="495" y="360" width="210" height="58" rx="18" fill="#ffffff" opacity="0.13"/>
+    <text x="528" y="397" fill="#ffffff" font-size="17">WhatsApp pedidos</text>
+    <rect x="770" y="360" width="210" height="58" rx="18" fill="#ffffff" opacity="0.13"/>
+    <text x="820" y="397" fill="#ffffff" font-size="17">Vercel Deploy</text>
+  </g>
+</svg>

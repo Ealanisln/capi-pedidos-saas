@@ -1,0 +1,40 @@
+﻿<svg width="1200" height="560" viewBox="0 0 1200 560" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Flujo de pedido Capi</title>
+  <desc id="desc">Flujo desde el menú público hasta cocina, caja y WhatsApp.</desc>
+  <rect width="1200" height="560" rx="36" fill="#f1fff9"/>
+  <text x="70" y="86" fill="#13201d" font-family="Arial, sans-serif" font-size="46" font-weight="800">Flujo del pedido</text>
+  <text x="72" y="124" fill="#49635d" font-family="Arial, sans-serif" font-size="20" font-weight="600">Del antojo del cliente al corte de caja, sin perder el control del negocio.</text>
+  <g font-family="Arial, sans-serif" font-weight="700">
+    <rect x="70" y="190" width="180" height="180" rx="30" fill="#13201d"/>
+    <text x="100" y="245" fill="#9cf2df" font-size="20">1. Menú</text>
+    <text x="100" y="285" fill="#ffffff" font-size="17">Cliente revisa</text>
+    <text x="100" y="312" fill="#ffffff" font-size="17">productos, fotos</text>
+    <text x="100" y="339" fill="#ffffff" font-size="17">y extras.</text>
+    <rect x="300" y="190" width="180" height="180" rx="30" fill="#06d6a0"/>
+    <text x="330" y="245" fill="#06332b" font-size="20">2. Carrito</text>
+    <text x="330" y="285" fill="#06332b" font-size="17">Selecciona</text>
+    <text x="330" y="312" fill="#06332b" font-size="17">cantidades y</text>
+    <text x="330" y="339" fill="#06332b" font-size="17">notas.</text>
+    <rect x="530" y="190" width="180" height="180" rx="30" fill="#ffd166"/>
+    <text x="560" y="245" fill="#3a2600" font-size="20">3. Pedido</text>
+    <text x="560" y="285" fill="#3a2600" font-size="17">API valida y</text>
+    <text x="560" y="312" fill="#3a2600" font-size="17">guarda en</text>
+    <text x="560" y="339" fill="#3a2600" font-size="17">PostgreSQL.</text>
+    <rect x="760" y="190" width="180" height="180" rx="30" fill="#ffb47d"/>
+    <text x="790" y="245" fill="#401500" font-size="20">4. Cocina</text>
+    <text x="790" y="285" fill="#401500" font-size="17">Comanda pasa</text>
+    <text x="790" y="312" fill="#401500" font-size="17">por estados</text>
+    <text x="790" y="339" fill="#401500" font-size="17">operativos.</text>
+    <rect x="990" y="190" width="140" height="180" rx="30" fill="#ffffff" stroke="#13201d" stroke-width="4"/>
+    <text x="1018" y="245" fill="#13201d" font-size="20">5. Caja</text>
+    <text x="1018" y="285" fill="#49635d" font-size="17">Cobro,</text>
+    <text x="1018" y="312" fill="#49635d" font-size="17">corte y</text>
+    <text x="1018" y="339" fill="#49635d" font-size="17">resumen.</text>
+  </g>
+  <path d="M255 280H292" stroke="#13201d" stroke-width="8" stroke-linecap="round"/>
+  <path d="M485 280H522" stroke="#13201d" stroke-width="8" stroke-linecap="round"/>
+  <path d="M715 280H752" stroke="#13201d" stroke-width="8" stroke-linecap="round"/>
+  <path d="M945 280H982" stroke="#13201d" stroke-width="8" stroke-linecap="round"/>
+  <rect x="270" y="430" width="660" height="64" rx="22" fill="#13201d"/>
+  <text x="330" y="470" fill="#ffffff" font-family="Arial, sans-serif" font-size="20" font-weight="700">WhatsApp recibe el mensaje listo para confirmar con el cliente.</text>
+</svg>

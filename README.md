@@ -1,49 +1,141 @@
-﻿# Capi Pedidos SaaS
+﻿# 🍽️ Capi Pedidos SaaS
 
-Capi Pedidos SaaS es una plataforma multi-tenant para restaurantes, fondas, cafeterias, taquerias, marisquerias, dark kitchens y negocios de comida que quieren publicar un menu digital, recibir pedidos por WhatsApp y administrar operacion diaria desde un panel web.
+![Arquitectura de Capi](./docs/assets/arquitectura.svg)
 
-El objetivo del repositorio es que el proyecto pueda ser revisado, mejorado y extendido por colaboradores sin exponer credenciales privadas ni datos productivos.
+Capi Pedidos SaaS es una plataforma multi-tenant para restaurantes, fondas, cafeterías, taquerías, marisquerías, dark kitchens y negocios de comida que quieren publicar un menú digital, recibir pedidos por WhatsApp y administrar su operación diaria desde un panel web.
 
-## Que hace el proyecto
+Este repositorio está pensado para dos tipos de personas:
 
-- Landing comercial para promocionar planes y demos.
-- Menu publico por negocio usando slugs como `/<nombre-del-negocio>`.
-- Panel administrativo protegido con NextAuth.
-- Gestion de negocios multi-tenant para super administrador.
-- Gestion de categorias, productos, precios, disponibilidad e imagenes.
-- Ingredientes visibles y modificadores avanzados para planes Pro/Enterprise.
-- Carrito publico con envio de pedido a WhatsApp.
-- Pedidos con estatus operativo.
-- Monitor de cocina para comandas activas.
-- Caja diaria opcional con cobros, metodos de pago y cortes.
-- Dashboard administrativo con ventas, pedidos y productos destacados.
-- Demos seed con datos realistas de negocios de comida en Mexico.
-- Reinicio automatico de demos mediante Vercel Cron.
-- Temas visuales administrables para menus publicos.
+- 👨‍🍳 Personas de negocio que quieren entender qué hace el sistema sin ser programadoras.
+- 🤖 Personas que hacen vibecoding con Claude, Codex, Gemini, Cursor, Windsurf, Antigravity u otros agentes de IA.
 
-## Stack tecnico
+> Regla importante: este repo es público y no incluye credenciales reales, bases de datos privadas ni accesos productivos.
 
-| Area | Tecnologia |
+---
+
+## 🚀 Resumen rápido
+
+| Pregunta | Respuesta corta |
+|---|---|
+| ¿Qué es? | Un SaaS de menús digitales y pedidos por WhatsApp para restaurantes. |
+| ¿Para quién es? | Restaurantes, cocinas, cafeterías, dark kitchens y negocios de comida. |
+| ¿Qué incluye? | Landing, menú público, admin, pedidos, cocina, caja, demos y temas. |
+| ¿Es multi-tenant? | Sí, cada negocio vive como un `Tenant`. |
+| ¿Base de datos? | PostgreSQL con Prisma. Recomendado: Neon Postgres en Vercel. |
+| ¿Hosting recomendado? | Vercel. |
+| ¿Idioma objetivo? | Español México. |
+| ¿Moneda objetivo? | Pesos mexicanos. |
+
+---
+
+## 🧭 ¿Qué problema resuelve?
+
+Muchos restaurantes reciben pedidos por WhatsApp de forma desordenada:
+
+- Fotos del menú desactualizadas.
+- Precios viejos circulando en chats.
+- Clientes preguntando lo mismo una y otra vez.
+- Pedidos incompletos o sin datos.
+- Cocina sin claridad de qué preparar.
+- Caja sin resumen del día.
+
+Capi busca ordenar ese flujo sin obligar al restaurante a instalar una app pesada ni cambiar de punto de venta.
+
+---
+
+## ✨ Funciones principales
+
+| Área | Qué permite |
+|---|---|
+| 🏠 Landing | Presenta planes, demos y propuesta comercial. |
+| 📱 Menú público | Cada negocio tiene URL propia como `/<slug>`. |
+| 🛒 Carrito | El cliente arma pedido y lo envía a WhatsApp. |
+| 🧾 Pedidos | El restaurante recibe órdenes con datos y estatus. |
+| 🍳 Cocina | Monitor de comandas activas por estado. |
+| 💵 Caja | Cobros, métodos de pago y cortes diarios opcionales. |
+| 🧑‍💼 Super admin | Alta de negocios, planes, vigencias y demos. |
+| 🎨 Temas | Apariencia pública configurable por giro. |
+| 📊 Dashboard | Ventas, pedidos, productos populares y operación. |
+| 🧪 Demos | Datos ficticios realistas para probar sin miedo. |
+
+---
+
+## 🖼️ Flujo del pedido
+
+![Flujo del pedido](./docs/assets/flujo-pedido.svg)
+
+1. El cliente entra al menú público.
+2. Revisa categorías, productos, fotos, ingredientes y extras.
+3. Agrega productos al carrito.
+4. Captura datos de contacto y tipo de servicio.
+5. El sistema guarda el pedido y genera mensaje de WhatsApp.
+6. Cocina cambia estados: pendiente, preparando, listo.
+7. Caja registra cobro y corte si el negocio lo necesita.
+
+---
+
+## 🧩 Planes incluidos
+
+| Función | Lite | Pro | Enterprise |
+|---|---:|---:|---:|
+| Menú público | ✅ | ✅ | ✅ |
+| Pedidos por WhatsApp | ✅ | ✅ | ✅ |
+| Categorías/productos | ✅ | ✅ | ✅ |
+| Control de agotados | ✅ | ✅ | ✅ |
+| Imágenes | ❌ | ✅ | ✅ |
+| Ingredientes visibles | ❌ | ✅ | ✅ |
+| Modificadores avanzados | ❌ | ✅ | ✅ |
+| Búsqueda/filtros | ❌ | ✅ | ✅ |
+| Analytics | ❌ | ✅ | ✅ |
+| Monitor de cocina | ❌ | ✅ | ✅ |
+| Caja diaria opcional | ❌ | ✅ | ✅ |
+
+---
+
+## 🧪 Demos locales que crea el seed
+
+| Demo | URL local | Plan | Giro |
+|---|---|---|---|
+| Fonda Lupita | `/fonda_lupita` | Lite | Cocina económica |
+| Taquería Don José | `/taqueria_don_jose` | Pro | Taquería |
+| Grupo Nopal Gourmet | `/grupo_nopal` | Enterprise | Operación premium |
+| Mariscos El Faro | `/mariscos_el_faro` | Pro | Marisquería |
+| Café Amanecer | `/cafe_amanecer` | Pro | Cafetería |
+| Pizza del Barrio | `/pizza_barrio` | Pro | Pizzería |
+
+Los usuarios demo se generan desde variables de entorno. No se publican contraseñas reales en el repositorio.
+
+---
+
+## 🛠️ Stack técnico
+
+| Área | Tecnología |
 |---|---|
 | Framework | Next.js 16 App Router |
 | UI | React 19 + Tailwind CSS 4 |
-| Autenticacion | NextAuth Credentials + JWT |
+| Autenticación | NextAuth Credentials + JWT |
 | Base de datos | PostgreSQL |
 | ORM | Prisma |
-| Validacion | Zod |
+| Validación | Zod |
 | Formularios | React Hook Form |
 | Datos demo | @faker-js/faker |
-| Hosting recomendado | Vercel |
-| Base recomendada en Vercel | Neon Postgres |
+| Hosting sugerido | Vercel |
+| BD recomendada | Neon Postgres |
 
-## Requisitos
+---
+
+## 🧑‍💻 Instalación rápida para principiantes
+
+### 1. Instala herramientas
+
+Necesitas:
 
 - Node.js 20 o superior.
-- npm 10 o superior.
-- PostgreSQL disponible localmente o en la nube.
+- npm.
 - Git.
+- Una base PostgreSQL.
 
-Verifica versiones:
+Verifica:
 
 ```bash
 node --version
@@ -51,11 +143,72 @@ npm --version
 git --version
 ```
 
-## Instalacion en Windows PowerShell
+### 2. Clona el proyecto
+
+```bash
+git clone https://github.com/Noh-JR/capi-pedidos-saas.git
+cd capi-pedidos-saas
+```
+
+### 3. Instala dependencias
+
+```bash
+npm install
+```
+
+### 4. Crea tu archivo `.env`
+
+Windows PowerShell:
 
 ```powershell
-git clone https://github.com/USUARIO/REPOSITORIO.git
-cd REPOSITORIO
+Copy-Item .env.example .env
+```
+
+macOS / Linux:
+
+```bash
+cp .env.example .env
+```
+
+### 5. Edita `.env`
+
+Cambia al menos:
+
+```env
+DATABASE_URL="postgresql://usuario:password@host:5432/base_de_datos?sslmode=require"
+DIRECT_URL="postgresql://usuario:password@host:5432/base_de_datos?sslmode=require"
+NEXTAUTH_SECRET="cambia-este-secreto"
+SEED_ADMIN_EMAIL="superadmin@example.com"
+SEED_ADMIN_PASSWORD="CambiaEstaClave123!"
+```
+
+### 6. Prepara la base de datos
+
+```bash
+npm run prisma:generate
+npx prisma db push
+npm run db:seed
+```
+
+### 7. Corre el proyecto
+
+```bash
+npm run dev
+```
+
+Abre:
+
+```text
+http://localhost:3000
+```
+
+---
+
+## 🪟 Windows PowerShell completo
+
+```powershell
+git clone https://github.com/Noh-JR/capi-pedidos-saas.git
+cd capi-pedidos-saas
 npm install
 Copy-Item .env.example .env
 npm run prisma:generate
@@ -64,17 +217,11 @@ npm run db:seed
 npm run dev
 ```
 
-Abre:
-
-```text
-http://localhost:3000
-```
-
-## Instalacion en macOS o Linux
+## 🍎 macOS completo
 
 ```bash
-git clone https://github.com/USUARIO/REPOSITORIO.git
-cd REPOSITORIO
+git clone https://github.com/Noh-JR/capi-pedidos-saas.git
+cd capi-pedidos-saas
 npm install
 cp .env.example .env
 npm run prisma:generate
@@ -83,116 +230,84 @@ npm run db:seed
 npm run dev
 ```
 
-Abre:
-
-```text
-http://localhost:3000
-```
-
-## Configuracion de base de datos
-
-Copia `.env.example` a `.env` y cambia las variables:
-
-```env
-DATABASE_URL="postgresql://usuario:password@host:5432/base_de_datos?sslmode=require"
-DIRECT_URL="postgresql://usuario:password@host:5432/base_de_datos?sslmode=require"
-NEXTAUTH_URL="http://localhost:3000"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-NEXTAUTH_SECRET="cambia-este-secreto"
-ROOT_DOMAIN="localhost"
-DEFAULT_TENANT_SLUG="capi"
-```
-
-Para produccion, genera un secreto fuerte:
+## 🐧 Linux completo
 
 ```bash
-openssl rand -base64 32
+git clone https://github.com/Noh-JR/capi-pedidos-saas.git
+cd capi-pedidos-saas
+npm install
+cp .env.example .env
+npm run prisma:generate
+npx prisma db push
+npm run db:seed
+npm run dev
 ```
 
-En Windows, si no tienes OpenSSL, puedes usar:
+---
 
-```powershell
-[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
-```
+## 🧠 Vibecoding con agentes de IA
 
-## Base de datos recomendada
+![Agentes IA](./docs/assets/agentes-ia.svg)
 
-Para Vercel se recomienda Neon Postgres porque se integra bien con Vercel Stores y Prisma.
+Este proyecto ya trae archivos pensados para agentes:
 
-Tambien puedes usar:
-
-- Supabase Postgres.
-- Railway Postgres.
-- Docker con PostgreSQL local.
-- Cualquier PostgreSQL compatible con Prisma.
-
-## Comandos principales
-
-| Comando | Uso |
+| Archivo | Para qué sirve |
 |---|---|
-| `npm run dev` | Inicia desarrollo local |
-| `npm run build` | Compila produccion |
-| `npm run start` | Sirve build local |
-| `npm run lint` | Ejecuta ESLint |
-| `npm run prisma:generate` | Genera Prisma Client |
-| `npx prisma db push` | Sincroniza schema con BD sin migracion versionada |
-| `npm run prisma:migrate -- --name nombre` | Crea migracion de desarrollo |
-| `npx prisma migrate deploy` | Aplica migraciones en produccion |
-| `npm run db:seed` | Carga datos demo |
+| `AGENTS.md` | Instrucciones generales para agentes de código. |
+| `CLAUDE.md` | Entrada rápida para Claude. |
+| `GEMINI.md` | Entrada rápida para Gemini. |
+| `CODEX.md` | Entrada rápida para Codex. |
+| `.github/copilot-instructions.md` | Contexto para GitHub Copilot. |
+| `docs/AGENTES_IA.md` | Guía detallada para usar IA sin romper el proyecto. |
+| `docs/GUIA_VIBECODING.md` | Manual paso a paso para vibecoding seguro. |
 
-## Usuarios seed locales
-
-Por seguridad, el repositorio no incluye credenciales productivas.
-
-El seed usa variables configurables:
-
-```env
-SEED_ADMIN_EMAIL="superadmin@example.com"
-SEED_ADMIN_PASSWORD="CambiaEstaClave123!"
-SEED_DEMO_EMAIL_DOMAIN="example.com"
-SEED_DEMO_PASSWORD="DemoLocal123!"
-```
-
-Despues de correr `npm run db:seed`, entra a:
+### Prompt inicial recomendado
 
 ```text
-http://localhost:3000/admin/login
+Estoy trabajando en Capi Pedidos SaaS. Lee README.md, AGENTS.md y docs/DOCUMENTACION_TECNICA.md antes de modificar código.
+
+Reglas:
+- Mantén la UI en español México.
+- No agregues credenciales reales.
+- No subas .env.
+- Respeta tenantId en consultas.
+- Si cambias funcionalidades, actualiza documentación.
+- Ejecuta npm run lint y npm run build antes de terminar.
+
+Tarea:
+[describe aquí lo que quieres cambiar]
 ```
 
-Usa el correo y password que definiste en `.env`.
+---
 
-## Demos locales incluidas
+## 📚 Documentación
 
-Despues del seed se crean negocios demo como:
+| Documento | Lectura recomendada |
+|---|---|
+| [Documentación técnica](./docs/DOCUMENTACION_TECNICA.md) | Arquitectura, rutas, datos y seguridad. |
+| [Manual de uso](./docs/MANUAL_DE_USO.md) | Cómo usar admin, cocina, caja y demos. |
+| [Guía de agentes IA](./docs/AGENTES_IA.md) | Cómo conectar Claude, Codex, Gemini y otros agentes. |
+| [Guía de vibecoding](./docs/GUIA_VIBECODING.md) | Cómo pedir cambios sin romper el proyecto. |
+| [Referencias de menús interactivos](./docs/ANALISIS_REFERENCIAS_MENUS_INTERACTIVOS.md) | Benchmark e ideas futuras. |
+| [Seguridad](./SECURITY.md) | Reglas para no exponer datos sensibles. |
+| [Contribuir](./CONTRIBUTING.md) | Cómo colaborar con Pull Requests. |
 
-| Demo | Slug | Plan |
-|---|---|---|
-| Fonda Lupita | `/fonda_lupita` | Lite |
-| Taqueria Don Jose | `/taqueria_don_jose` | Pro |
-| Grupo Nopal Gourmet | `/grupo_nopal` | Enterprise |
-| Mariscos El Faro | `/mariscos_el_faro` | Pro |
-| Cafe Amanecer | `/cafe_amanecer` | Pro |
-| Pizza del Barrio | `/pizza_barrio` | Pro |
+---
 
-Los correos demo se generan con `SEED_DEMO_EMAIL_DOMAIN` y todos usan `SEED_DEMO_PASSWORD` en local.
+## 🔐 Seguridad básica
 
-## Planes funcionales
+Antes de publicar o desplegar:
 
-| Funcion | Lite | Pro | Enterprise |
-|---|---|---|---|
-| Menu publico | Si | Si | Si |
-| Pedidos por WhatsApp | Si | Si | Si |
-| Categorias/productos ilimitados | Si | Si | Si |
-| Control de agotados | Si | Si | Si |
-| Imagenes | No | Si | Si |
-| Ingredientes visibles | No | Si | Si |
-| Modificadores avanzados | No | Si | Si |
-| Busqueda/filtros | No | Si | Si |
-| Analytics | No | Si | Si |
-| Monitor de cocina | No | Si | Si |
-| Caja diaria opcional | No | Si | Si |
+- Nunca subas `.env`.
+- Cambia `NEXTAUTH_SECRET`.
+- Cambia passwords seed.
+- No uses credenciales demo reales en documentación pública.
+- Revisa variables en Vercel y en tu proveedor de base de datos.
+- Rota credenciales si alguna vez fueron compartidas.
 
-## Estructura del proyecto
+---
+
+## 🧱 Estructura del proyecto
 
 ```text
 prisma/
@@ -203,70 +318,47 @@ src/
   components/         Componentes de UI
   lib/                Auth, Prisma, tenants, formatos y temas
 docs/
-  DOCUMENTACION_TECNICA.md
-  MANUAL_DE_USO.md
-  ANALISIS_REFERENCIAS_MENUS_INTERACTIVOS.md
+  assets/             Imágenes SVG para GitHub
+  AGENTES_IA.md       Guía para agentes
+  GUIA_VIBECODING.md  Guía para cambios asistidos por IA
 public/
   .well-known/security.txt
 ```
 
-## Despliegue en Vercel
+---
 
-1. Crea una base PostgreSQL.
-2. Sube el repositorio a GitHub.
-3. Importa el repo en Vercel.
-4. Agrega variables de entorno en Vercel Project Settings.
-5. Ejecuta migraciones:
+## ✅ Comandos de validación
+
+Antes de subir cambios:
 
 ```bash
-npx prisma migrate deploy
+npm run lint
+npm run build
 ```
 
-6. Si quieres cargar demos:
+Si cambias Prisma:
 
 ```bash
-npm run db:seed
+npm run prisma:generate
+npx prisma db push
 ```
 
-7. Configura dominio/subdominio en Vercel Domains.
-8. Define `NEXTAUTH_URL`, `NEXT_PUBLIC_APP_URL`, `ROOT_DOMAIN` y `DEFAULT_TENANT_SLUG` con los valores de produccion.
+---
 
-## Cron de demos
+## 🗺️ Roadmap sugerido
 
-El endpoint `/api/cron/reset-demos` reinicia demos vencidas.
+- Rate limiting en login y pedidos.
+- Auditoría de cambios administrativos.
+- QR por mesa.
+- Inventario ligero por insumo.
+- Recetas y costos.
+- Promociones por horario.
+- PWA instalable.
+- Pruebas end-to-end.
+- Integración de pagos de suscripción.
 
-Configura `CRON_SECRET` y en Vercel usa una tarea programada que mande:
+---
 
-```text
-Authorization: Bearer TU_CRON_SECRET
-```
+## 📄 Licencia
 
-## Seguridad
-
-Antes de publicar o desplegar:
-
-- Nunca subas `.env`.
-- Cambia `NEXTAUTH_SECRET`.
-- Cambia passwords seed.
-- No uses credenciales demo en produccion si el sitio es publico.
-- Revisa variables en Vercel y en tu proveedor de base de datos.
-- Rota credenciales si alguna vez fueron compartidas.
-
-## Como colaborar
-
-1. Haz fork del repositorio.
-2. Crea una rama descriptiva.
-3. Ejecuta `npm run lint` y `npm run build`.
-4. Abre un Pull Request explicando el cambio.
-
-Lee [CONTRIBUTING.md](./CONTRIBUTING.md) para mas detalles.
-
-## Documentacion adicional
-
-- [Documentacion tecnica](./docs/DOCUMENTACION_TECNICA.md)
-- [Manual de uso](./docs/MANUAL_DE_USO.md)
-- [Analisis de referencias](./docs/ANALISIS_REFERENCIAS_MENUS_INTERACTIVOS.md)
-
-## Licencia
-
-Licencia pendiente por definir por el propietario del proyecto. Si deseas reutilizar este codigo fuera de una contribucion al repositorio, solicita autorizacion primero.
+Licencia pendiente por definir por el propietario del proyecto. Si deseas reutilizar este código fuera de una contribución al repositorio, solicita autorización primero.
