@@ -663,7 +663,7 @@ export function MenuClient({
         >
           <span className="text-sm font-black">{formatNumber(cartItemsCount)} productos</span>
           <span className={`rounded-xl px-4 py-2 text-sm font-black ${template.primaryBtn}`}>
-            Ver pedido · {formatMoney(total)}
+            Ver pedido - {formatMoney(total)}
           </span>
         </a>
       ) : null}

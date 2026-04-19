@@ -86,7 +86,7 @@ export default async function KitchenPage() {
                           <p className="text-lg font-black text-slate-950">{order.orderNumber}</p>
                           <p className="text-xs font-semibold text-slate-500">
                             {serviceLabel[order.serviceType]}
-                            {order.tableName ? ` · ${order.tableName}` : ""}
+                            {order.tableName ? ` - ${order.tableName}` : ""}
                           </p>
                         </div>
                         <p className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">

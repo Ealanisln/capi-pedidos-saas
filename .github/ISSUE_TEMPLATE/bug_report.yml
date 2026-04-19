@@ -1,0 +1,50 @@
+name: Reporte de error
+description: Reporta algo que no funciona como deberia
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Que paso
+      description: Describe el error con claridad.
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Que esperabas
+      description: Explica el resultado correcto.
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducir
+      placeholder: "1. Entrar a...
+2. Dar click en...
+3. Ver error..."
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Landing
+        - Menu publico
+        - Admin
+        - Cocina
+        - Caja
+        - Meseros
+        - Impresion
+        - Reportes
+        - Base de datos
+        - Otro
+    validations:
+      required: true
+  - type: textarea
+    id: capturas
+    attributes:
+      label: Capturas
+      description: Agrega capturas sin datos sensibles.

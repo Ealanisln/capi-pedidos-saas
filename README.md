@@ -1,225 +1,121 @@
-# 🍽️ Capi Pedidos SaaS
+# Capi Pedidos SaaS
 
 ![Arquitectura de Capi](./docs/assets/arquitectura.svg)
 
-Capi Pedidos SaaS es una plataforma multi-tenant para restaurantes, fondas, cafeterías, taquerías, marisquerías, dark kitchens y negocios de comida que quieren publicar un menú digital, recibir pedidos por WhatsApp y administrar su operación diaria desde un panel web.
+Capi Pedidos SaaS es una plataforma multi-tenant para menus digitales, pedidos por WhatsApp, cocina, caja, comandero de meseros, impresion termica y reportes para restaurantes en Mexico.
 
-Este repositorio está pensado para dos tipos de personas:
+Demo instalada: [https://capi.nohmendez.xyz/](https://capi.nohmendez.xyz/)
 
-- 👨‍🍳 Personas de negocio que quieren entender qué hace el sistema sin ser programadoras.
-- 🤖 Personas que hacen vibecoding con Claude, Codex, Gemini, Cursor, Windsurf, Antigravity u otros agentes de IA.
+Creado por **Rafael Noh - Soluciones Tecnologicas Playa del Carmen**.
 
-> Regla importante: este repo es público y no incluye credenciales reales, bases de datos privadas ni accesos productivos.
+Contacto: [Sitio web](http://nohmendez.xyz/) | [Facebook](https://www.facebook.com/people/Soluciones-Tecnologicas-Playa-del-Carmen/61586167409780/) | [WhatsApp](https://wa.me/529842046913)
 
----
+> Este repositorio es publico para recibir ayuda, mejoras y colaboraciones. No incluye credenciales reales ni accesos privados de produccion.
 
-## 🚀 Resumen rápido
+## About sugerido para GitHub
 
-| Pregunta | Respuesta corta |
+Descripcion corta:
+
+```text
+SaaS multi-tenant para menus digitales, pedidos por WhatsApp, caja, cocina e impresion termica para restaurantes en Mexico.
+```
+
+Website:
+
+```text
+https://capi.nohmendez.xyz/
+```
+
+Topics sugeridos:
+
+`nextjs`, `prisma`, `postgresql`, `vercel`, `restaurant`, `saas`, `mexico`, `pos`, `whatsapp`, `thermal-printer`, `vibecoding`, `typescript`, `tailwindcss`.
+
+## Por que se llama Capi
+
+La idea nacio porque la esposa y el hermano de Rafael tienen negocios de antojitos mexicanos en Quintana Roo y necesitaban una app que se ajustara a su forma real de vender: menu facil, pedidos claros, cocina organizada y caja sencilla.
+
+La hija menor de Rafael eligio a la capibara como imagen representativa. Su pareja, que cocina muy bien, dejo el concepto como **La Capibara Feliz**. De ahi nace Capi: un proyecto pensado para ayudar a emprendedores de comida a empezar simple, elegir su categoria y escalar a su ritmo.
+
+## Que problema resuelve
+
+Muchos negocios pequenos reciben pedidos por WhatsApp con fotos viejas, precios desactualizados, notas incompletas y sin orden para cocina o caja. Capi centraliza ese flujo sin obligar al restaurante a comprar un punto de venta pesado desde el primer dia.
+
+## Funciones principales
+
+| Area | Que incluye |
 |---|---|
-| ¿Qué es? | Un SaaS de menús digitales y pedidos por WhatsApp para restaurantes. |
-| ¿Para quién es? | Restaurantes, cocinas, cafeterías, dark kitchens y negocios de comida. |
-| ¿Qué incluye? | Landing, menú público, admin, pedidos, cocina, caja, demos y temas. |
-| ¿Es multi-tenant? | Sí, cada negocio vive como un `Tenant`. |
-| ¿Base de datos? | PostgreSQL con Prisma. Recomendado: Neon Postgres en Vercel. |
-| ¿Hosting recomendado? | Vercel. |
-| ¿Idioma objetivo? | Español México. |
-| ¿Moneda objetivo? | Pesos mexicanos. |
+| Landing comercial | Presentacion de planes, demos y enlaces de contacto. |
+| Menu publico | URL por negocio como `/taqueria_don_jose` o `/fonda_lupita`. |
+| Carrito | El cliente arma su pedido y lo envia por WhatsApp. |
+| Pedidos | Registro de ordenes, estados y datos del cliente. |
+| Cocina | Monitor de produccion por pedidos y estados. |
+| Caja | Apertura, cobros, propinas, movimientos, precorte y cierre. |
+| Meseros | Usuarios limitados, mesas y flujo de comandero por plan. |
+| Impresion | Tickets de venta, produccion, precuenta y estaciones por area. |
+| Super admin | Alta de restaurantes, planes, vigencias y demos. |
+| Reportes | URL con token para Excel, PowerBI o sistemas externos. |
+| Demos | Datos ficticios enriquecidos para vender mostrando funciones reales. |
 
----
+## Planes comerciales
 
-## 🧭 ¿Qué problema resuelve?
+| Funcion | Lite $190 MXN/mes | Pro $350 MXN/mes | Enterprise $550 MXN/mes |
+|---|---:|---:|---:|
+| Menu publico | Si | Si | Si |
+| Pedidos por WhatsApp | Si | Si | Si |
+| Productos y categorias | Ilimitado operativo | Ilimitado operativo | Ilimitado operativo |
+| Imagenes de producto | No | Si | Si |
+| Ingredientes visibles | No | Si | Si |
+| Modificadores avanzados | Basicos | Si | Si |
+| Busqueda y filtros | Basico | Si | Si |
+| Dashboard y analisis | Basico | Si | Avanzado |
+| Caja | 1 caja | 3 cajas | Hasta 8 cajas |
+| Meseros | 2 | 8 | 30 |
+| Mesas | 10 | 35 | 120 |
+| Estaciones de impresion | 3 | 6 | 12 |
+| Reportes Excel/PowerBI | Si | Si | Si |
 
-Muchos restaurantes reciben pedidos por WhatsApp de forma desordenada:
+## Demos en produccion
 
-- Fotos del menú desactualizadas.
-- Precios viejos circulando en chats.
-- Clientes preguntando lo mismo una y otra vez.
-- Pedidos incompletos o sin datos.
-- Cocina sin claridad de qué preparar.
-- Caja sin resumen del día.
+| Demo | Plan | Menu publico | Panel admin demo |
+|---|---|---|---|
+| Fonda Lupita | Lite | [Ver menu](https://capi.nohmendez.xyz/fonda_lupita) | [Entrar demo](https://capi.nohmendez.xyz/admin/login?demo=lite) |
+| Taqueria Don Jose | Pro | [Ver menu](https://capi.nohmendez.xyz/taqueria_don_jose) | [Entrar demo](https://capi.nohmendez.xyz/admin/login?demo=pro) |
+| Grupo Nopal Gourmet | Enterprise | [Ver menu](https://capi.nohmendez.xyz/grupo_nopal) | [Entrar demo](https://capi.nohmendez.xyz/admin/login?demo=enterprise) |
+| Mariscos El Faro | Pro | [Ver menu](https://capi.nohmendez.xyz/mariscos_el_faro) | [Entrar demo](https://capi.nohmendez.xyz/admin/login?demo=mariscos) |
+| Cafe Amanecer | Pro | [Ver menu](https://capi.nohmendez.xyz/cafe_amanecer) | [Entrar demo](https://capi.nohmendez.xyz/admin/login?demo=cafe) |
+| Pizza del Barrio | Pro | [Ver menu](https://capi.nohmendez.xyz/pizza_barrio) | [Entrar demo](https://capi.nohmendez.xyz/admin/login?demo=pizza) |
 
-Capi busca ordenar ese flujo sin obligar al restaurante a instalar una app pesada ni cambiar de punto de venta.
-
----
-
-## ✨ Funciones principales
-
-| Área | Qué permite |
-|---|---|
-| 🏠 Landing | Presenta planes, demos y propuesta comercial. |
-| 📱 Menú público | Cada negocio tiene URL propia como `/<slug>`. |
-| 🛒 Carrito | El cliente arma pedido y lo envía a WhatsApp. |
-| 🧾 Pedidos | El restaurante recibe órdenes con datos y estatus. |
-| 🍳 Cocina | Monitor de comandas activas por estado. |
-| 💵 Caja | Cajas configurables, cobros, precorte, movimientos y cortes diarios opcionales. |
-| 🧑‍🍳 Comandero | Meseros, mesas y flujo de precuenta preparado por plan. |
-| 🖨️ Impresión | Tickets de venta/producción y estaciones por cocina, barra, caja o general. |
-| 🧑‍💼 Super admin | Alta de negocios, planes, vigencias y demos. |
-| 🎨 Temas | Apariencia pública configurable por giro. |
-| 📊 Dashboard | Ventas, pedidos, productos populares y operación. |
-| 🧪 Demos | Datos ficticios realistas para probar sin miedo. |
-
----
-
-## 🖼️ Flujo del pedido
+## Flujo del pedido
 
 ![Flujo del pedido](./docs/assets/flujo-pedido.svg)
 
-1. El cliente entra al menú público.
-2. Revisa categorías, productos, fotos, ingredientes y extras.
+1. El cliente entra al menu publico del restaurante.
+2. Revisa categorias, productos, ingredientes, extras y precios.
 3. Agrega productos al carrito.
-4. Captura datos de contacto y tipo de servicio.
-5. El sistema guarda el pedido y genera mensaje de WhatsApp.
-6. Cocina cambia estados: pendiente, preparando, listo.
-7. Caja registra cobro y corte si el negocio lo necesita.
+4. Captura datos de servicio: recoger, mesa, mostrador o domicilio.
+5. El sistema guarda el pedido y prepara el mensaje de WhatsApp.
+6. Cocina visualiza o imprime la comanda.
+7. Caja cobra, calcula cambio, registra propinas y emite ticket.
+8. El administrador puede analizar ventas en dashboard, Excel o PowerBI.
 
----
+## Stack tecnico
 
-## 🧩 Planes incluidos
-
-| Función | Lite | Pro | Enterprise |
-|---|---:|---:|---:|
-| Menú público | ✅ | ✅ | ✅ |
-| Pedidos por WhatsApp | ✅ | ✅ | ✅ |
-| Categorías/productos | ✅ | ✅ | ✅ |
-| Control de agotados | ✅ | ✅ | ✅ |
-| Imágenes | ❌ | ✅ | ✅ |
-| Ingredientes visibles | ❌ | ✅ | ✅ |
-| Modificadores avanzados | ❌ | ✅ | ✅ |
-| Búsqueda/filtros | ❌ | ✅ | ✅ |
-| Analytics | ❌ | ✅ | ✅ |
-| Monitor de cocina | Básico | ✅ | ✅ |
-| Caja diaria opcional | 1 caja | 3 cajas | Hasta 8 cajas |
-| Meseros/comandero | 2 meseros | 8 meseros | 30 meseros |
-| Mesas configurables | 10 mesas | 35 mesas | 120 mesas |
-| Estaciones de impresión | 3 estaciones | 6 estaciones | 12 estaciones |
-
----
-
-## 🧪 Demos locales que crea el seed
-
-| Demo | URL local | Plan | Giro |
-|---|---|---|---|
-| Fonda Lupita | `/fonda_lupita` | Lite | Cocina económica |
-| Taquería Don José | `/taqueria_don_jose` | Pro | Taquería |
-| Grupo Nopal Gourmet | `/grupo_nopal` | Enterprise | Operación premium |
-| Mariscos El Faro | `/mariscos_el_faro` | Pro | Marisquería |
-| Café Amanecer | `/cafe_amanecer` | Pro | Cafetería |
-| Pizza del Barrio | `/pizza_barrio` | Pro | Pizzería |
-
-Los usuarios demo se generan desde variables de entorno. No se publican contraseñas reales en el repositorio.
-
-Cada demo también crea datos operativos para probar sin inventar nada manualmente:
-
-| Módulo demo | Qué incluye |
-|---|---|
-| Mesas | Lite con 10 mesas, Pro con 15 en Taquería Don José y Enterprise con más capacidad. |
-| Meseros | Usuarios con rol `MESERO`; Taquería Don José incluye 7 meseros demo. |
-| Caja | Cajas según plan, turno abierto, movimientos, propinas y precorte. |
-| Impresión | Estaciones para caja, cocina caliente, barra de bebidas e impresora general. |
-| Ventas | Dos meses de pedidos, pagos, cancelaciones, pedidos por cobrar y precuentas. |
-
----
-
-## 🛠️ Stack técnico
-
-| Área | Tecnología |
+| Capa | Tecnologia |
 |---|---|
 | Framework | Next.js 16 App Router |
 | UI | React 19 + Tailwind CSS 4 |
-| Autenticación | NextAuth Credentials + JWT |
+| Autenticacion | NextAuth Credentials + JWT |
 | Base de datos | PostgreSQL |
 | ORM | Prisma |
-| Validación | Zod |
-| Formularios | React Hook Form |
+| Validacion | Zod |
 | Datos demo | @faker-js/faker |
-| Hosting sugerido | Vercel |
-| BD recomendada | Neon Postgres |
+| Hosting recomendado | Vercel |
+| Base recomendada | Neon Postgres en Vercel Stores |
+| Impresion silenciosa | Capi Print Bridge con Electron |
 
----
+## Instalacion rapida
 
-## 🧑‍💻 Instalación rápida para principiantes
-
-### 1. Instala herramientas
-
-Necesitas:
-
-- Node.js 20 o superior.
-- npm.
-- Git.
-- Una base PostgreSQL.
-
-Verifica:
-
-```bash
-node --version
-npm --version
-git --version
-```
-
-### 2. Clona el proyecto
-
-```bash
-git clone https://github.com/Noh-JR/capi-pedidos-saas.git
-cd capi-pedidos-saas
-```
-
-### 3. Instala dependencias
-
-```bash
-npm install
-```
-
-### 4. Crea tu archivo `.env`
-
-Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-macOS / Linux:
-
-```bash
-cp .env.example .env
-```
-
-### 5. Edita `.env`
-
-Cambia al menos:
-
-```env
-DATABASE_URL="postgresql://usuario:password@host:5432/base_de_datos?sslmode=require"
-DIRECT_URL="postgresql://usuario:password@host:5432/base_de_datos?sslmode=require"
-NEXTAUTH_SECRET="cambia-este-secreto"
-SEED_ADMIN_EMAIL="superadmin@example.com"
-SEED_ADMIN_PASSWORD="CambiaEstaClave123!"
-```
-
-### 6. Prepara la base de datos
-
-```bash
-npm run prisma:generate
-npx prisma db push
-npm run db:seed
-```
-
-### 7. Corre el proyecto
-
-```bash
-npm run dev
-```
-
-Abre:
-
-```text
-http://localhost:3000
-```
-
----
-
-## 🪟 Windows PowerShell completo
+### Windows PowerShell
 
 ```powershell
 git clone https://github.com/Noh-JR/capi-pedidos-saas.git
@@ -232,7 +128,7 @@ npm run db:seed
 npm run dev
 ```
 
-## 🍎 macOS completo
+### macOS y Linux
 
 ```bash
 git clone https://github.com/Noh-JR/capi-pedidos-saas.git
@@ -245,106 +141,108 @@ npm run db:seed
 npm run dev
 ```
 
-## 🐧 Linux completo
+Despues abre [http://localhost:3000](http://localhost:3000).
 
-```bash
-git clone https://github.com/Noh-JR/capi-pedidos-saas.git
-cd capi-pedidos-saas
-npm install
-cp .env.example .env
-npm run prisma:generate
-npx prisma db push
-npm run db:seed
-npm run dev
-```
+## Variables importantes
 
----
-
-## 🧠 Vibecoding con agentes de IA
-
-![Agentes IA](./docs/assets/agentes-ia.svg)
-
-Este proyecto ya trae archivos pensados para agentes:
-
-| Archivo | Para qué sirve |
+| Variable | Para que sirve |
 |---|---|
-| `AGENTS.md` | Instrucciones generales para agentes de código. |
-| `CLAUDE.md` | Entrada rápida para Claude. |
-| `GEMINI.md` | Entrada rápida para Gemini. |
-| `CODEX.md` | Entrada rápida para Codex. |
-| `.github/copilot-instructions.md` | Contexto para GitHub Copilot. |
-| `docs/AGENTES_IA.md` | Guía detallada para usar IA sin romper el proyecto. |
-| `docs/GUIA_VIBECODING.md` | Manual paso a paso para vibecoding seguro. |
+| `DATABASE_URL` | Conexion pooled a PostgreSQL. |
+| `DIRECT_URL` | Conexion directa para Prisma. |
+| `NEXTAUTH_SECRET` | Firma segura de sesiones. |
+| `NEXTAUTH_URL` | URL base de autenticacion. |
+| `NEXT_PUBLIC_APP_URL` | URL publica para tickets/reportes. |
+| `PRINT_BRIDGE_TOKEN` | Token del puente local de impresion. |
+| `SEED_ADMIN_EMAIL` | Correo del super administrador seed. |
+| `SEED_ADMIN_PASSWORD` | Password local/seed del super administrador. |
+| `SEED_DEMO_EMAIL_DOMAIN` | Dominio para usuarios demo. |
+| `SEED_DEMO_PASSWORD` | Password de demos locales. |
 
-### Prompt inicial recomendado
-
-```text
-Estoy trabajando en Capi Pedidos SaaS. Lee README.md, AGENTS.md y docs/DOCUMENTACION_TECNICA.md antes de modificar código.
-
-Reglas:
-- Mantén la UI en español México.
-- No agregues credenciales reales.
-- No subas .env.
-- Respeta tenantId en consultas.
-- Si cambias funcionalidades, actualiza documentación.
-- Ejecuta npm run lint y npm run build antes de terminar.
-
-Tarea:
-[describe aquí lo que quieres cambiar]
-```
-
----
-
-## 📚 Documentación
-
-| Documento | Lectura recomendada |
-|---|---|
-| [Documentación técnica](./docs/DOCUMENTACION_TECNICA.md) | Arquitectura, rutas, datos y seguridad. |
-| [Manual de uso](./docs/MANUAL_DE_USO.md) | Cómo usar admin, cocina, caja y demos. |
-| [Guía de agentes IA](./docs/AGENTES_IA.md) | Cómo conectar Claude, Codex, Gemini y otros agentes. |
-| [Guía de vibecoding](./docs/GUIA_VIBECODING.md) | Cómo pedir cambios sin romper el proyecto. |
-| [Referencias de menús interactivos](./docs/ANALISIS_REFERENCIAS_MENUS_INTERACTIVOS.md) | Benchmark e ideas futuras. |
-| [Seguridad](./SECURITY.md) | Reglas para no exponer datos sensibles. |
-| [Contribuir](./CONTRIBUTING.md) | Cómo colaborar con Pull Requests. |
-
----
-
-## 🔐 Seguridad básica
-
-Antes de publicar o desplegar:
-
-- Nunca subas `.env`.
-- Cambia `NEXTAUTH_SECRET`.
-- Cambia passwords seed.
-- No uses credenciales demo reales en documentación pública.
-- Revisa variables en Vercel y en tu proveedor de base de datos.
-- Rota credenciales si alguna vez fueron compartidas.
-
----
-
-## 🧱 Estructura del proyecto
+## Estructura del proyecto
 
 ```text
 prisma/
-  schema.prisma       Modelo de datos
-  seed.ts             Datos demo realistas
+  schema.prisma                 Modelos de datos y enums
+  seed.ts                       Demos y datos operativos
 src/
-  app/                Rutas App Router
-  components/         Componentes de UI
-  lib/                Auth, Prisma, tenants, formatos y temas
+  app/                          Rutas Next.js App Router
+  app/(admin)/admin             Panel administrativo
+  app/api/orders                Creacion de pedidos
+  app/api/print                 Cola de impresion para puente local
+  app/api/reportes              Exportes CSV/JSON con token
+  components/                   Componentes reutilizables
+  lib/                          Auth, Prisma, tickets, temas, formatos
+  types/                        Tipos globales
+server externo local/
+  tools/capi-print-bridge       App Electron para impresion silenciosa
 docs/
-  assets/             Imágenes SVG para GitHub
-  AGENTES_IA.md       Guía para agentes
-  GUIA_VIBECODING.md  Guía para cambios asistidos por IA
-public/
-  .well-known/security.txt
+  DOCUMENTACION_TECNICA.md      Arquitectura y decisiones tecnicas
+  MANUAL_DE_USO.md              Manual para restaurantes
+  IMPRESION_LOCAL.md            Guia de impresoras termicas
+  REPORTES_POWERBI_EXCEL.md     Conexion a Excel y PowerBI
+  GUIA_VIBECODING.md            Como colaborar con IA
 ```
 
----
+## Reportes para Excel y PowerBI
 
-## ✅ Comandos de validación
+Cada restaurante puede crear un token desde `Admin > Reportes`. Ese token permite consultar ventas sin usar usuario y contrasena.
 
-Antes de subir cambios:
+Ejemplo CSV:
+
+```text
+https://capi.nohmendez.xyz/api/reportes/taqueria_don_jose/ventas?token=TU_TOKEN&formato=csv&desde=2026-03-01&hasta=2026-04-19
+```
+
+Ejemplo JSON:
+
+```text
+https://capi.nohmendez.xyz/api/reportes/taqueria_don_jose/ventas?token=TU_TOKEN&formato=json&desde=2026-03-01&hasta=2026-04-19
+```
+
+Lee la guia completa: [Reportes PowerBI y Excel](./docs/REPORTES_POWERBI_EXCEL.md).
+
+## Impresion termica
+
+Capi soporta trabajos de impresion para ticket de venta y produccion. En produccion real, una app local de Windows llamada **Capi Print Bridge** consulta trabajos pendientes y manda imprimir silenciosamente a impresoras de 58 mm u 80 mm.
+
+Lee la guia completa: [Impresion local](./docs/IMPRESION_LOCAL.md).
+
+## Vibecoding con IA
+
+![Agentes IA](./docs/assets/agentes-ia.svg)
+
+Archivos utiles para agentes:
+
+| Archivo | Uso recomendado |
+|---|---|
+| `AGENTS.md` | Reglas generales para agentes. |
+| `CLAUDE.md` | Contexto para Claude. |
+| `CODEX.md` | Contexto para Codex. |
+| `GEMINI.md` | Contexto para Gemini. |
+| `.github/copilot-instructions.md` | Contexto para GitHub Copilot. |
+| `docs/GUIA_VIBECODING.md` | Guia para pedir cambios con IA. |
+| `docs/DOCUMENTACION_TECNICA.md` | Arquitectura antes de tocar codigo. |
+
+Prompt base:
+
+```text
+Lee README.md, AGENTS.md y docs/DOCUMENTACION_TECNICA.md antes de cambiar codigo.
+Mant?n la UI en espa?ol Mexico.
+No subas .env ni credenciales.
+Respeta tenantId en todas las consultas.
+Si modificas comportamiento, actualiza documentacion.
+Ejecuta npm run lint y npm run build antes de terminar.
+```
+
+## Como colaborar
+
+1. Lee [CONTRIBUTING.md](./CONTRIBUTING.md).
+2. Crea un branch con la convencion definida.
+3. Haz cambios pequenos y explicables.
+4. Ejecuta validaciones.
+5. Abre Pull Request con capturas si cambia la UI.
+
+## Comandos de validacion
 
 ```bash
 npm run lint
@@ -356,24 +254,11 @@ Si cambias Prisma:
 ```bash
 npm run prisma:generate
 npx prisma db push
+npm run db:seed
 ```
 
----
+## Licencia
 
-## 🗺️ Roadmap sugerido
+Este proyecto usa una licencia de colaboracion publica con derechos reservados. Puedes ver, estudiar, hacer fork y proponer mejoras por Pull Request, pero no puedes revender, sublicenciar ni explotar comercialmente este codigo como SaaS, plantilla o producto sin permiso escrito de Rafael Noh.
 
-- Rate limiting en login y pedidos.
-- Auditoría de cambios administrativos.
-- QR por mesa.
-- Inventario ligero por insumo.
-- Recetas y costos.
-- Promociones por horario.
-- PWA instalable.
-- Pruebas end-to-end.
-- Integración de pagos de suscripción.
-
----
-
-## 📄 Licencia
-
-Licencia pendiente por definir por el propietario del proyecto. Si deseas reutilizar este código fuera de una contribución al repositorio, solicita autorización primero.
+Lee [LICENSE](./LICENSE).

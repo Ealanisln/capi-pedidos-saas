@@ -38,12 +38,12 @@ export default async function MesasPage() {
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{formatNumber(tables.length)} / {formatNumber(tenant?.maxTables ?? 10)}</span>
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-3 xl:grid-cols-5">
-          {tables.length === 0 ? <p className="text-sm text-slate-600">A�n no hay mesas configuradas.</p> : tables.map((table) => {
+          {tables.length === 0 ? <p className="text-sm text-slate-600">Aun no hay mesas configuradas.</p> : tables.map((table) => {
             const order = orderByTable.get(table.id);
             return (
               <article key={table.id} className="rounded-3xl border border-slate-200 bg-white p-4">
                 <p className="text-lg font-black text-slate-950">{table.name}</p>
-                <p className="text-sm text-slate-600">{table.area ?? "Sal�n"} � {formatNumber(table.capacity)} lugares</p>
+                <p className="text-sm text-slate-600">{table.area ?? "Salon"} - {formatNumber(table.capacity)} lugares</p>
                 <span className="mt-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{statusLabel[table.status]}</span>
                 {order ? (
                   <div className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm text-amber-950">

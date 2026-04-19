@@ -1,70 +1,73 @@
-﻿# CONTRIBUTING
+# Como colaborar en Capi Pedidos SaaS
 
-Gracias por querer mejorar Capi Pedidos SaaS. Este proyecto busca ser una base colaborativa para menus digitales, pedidos por WhatsApp y operacion restaurantera en Mexico y Latinoamerica.
+Gracias por querer ayudar. Capi nacio para apoyar negocios reales de comida en Quintana Roo y puede crecer mucho con colaboracion bien ordenada.
 
 ## Antes de empezar
 
-- No subas credenciales, `.env`, tokens, conexiones de base de datos ni datos reales de clientes.
-- Usa datos ficticios en seeds, pruebas, capturas y documentacion.
-- Si encuentras una vulnerabilidad, no abras un issue publico con el detalle explotable. Lee `SECURITY.md`.
+Lee estos archivos:
+
+| Archivo | Por que importa |
+|---|---|
+| README.md | Vision general y demo publica. |
+| docs/DOCUMENTACION_TECNICA.md | Arquitectura y modelos. |
+| docs/MANUAL_DE_USO.md | Como lo usara un restaurante. |
+| SECURITY.md | Reglas para no exponer datos. |
+| LICENSE | Alcance de uso y derechos reservados. |
+
+## Convencion de branches
+
+Usa nombres claros, en minusculas y sin espacios.
+
+| Tipo | Ejemplo | Cuando usarlo |
+|---|---|---|
+| feat | feat/caja-pago-mixto | Nueva funcionalidad. |
+| fix | fix/ticket-cambio-efectivo | Correccion de bug. |
+| docs | docs/manual-impresion | Documentacion. |
+| chore | chore/actualizar-dependencias | Mantenimiento. |
+| refactor | refactor/reportes-api | Cambio interno sin nueva funcion. |
+| hotfix | hotfix/login-produccion | Arreglo urgente. |
+| codex | codex/reportes-powerbi | Trabajo generado con Codex. |
 
 ## Flujo recomendado
 
-1. Haz fork del repositorio.
-2. Crea una rama:
+1. Crea un issue o comenta que vas a trabajar.
+2. Crea branch desde `main`.
+3. Haz cambios pequenos.
+4. Ejecuta `npm run lint`.
+5. Ejecuta `npm run build`.
+6. Si cambias Prisma, ejecuta `npx prisma db push` en tu entorno local y actualiza seed si aplica.
+7. Abre Pull Request con descripcion clara.
 
-```bash
-git checkout -b mejora/nombre-del-cambio
+## Reglas importantes
+
+- No subir `.env`.
+- No publicar tokens, passwords, URLs privadas de bases de datos ni capturas con secretos.
+- Mantener textos visibles en espa?ol Mexico.
+- Respetar multi-tenant: toda consulta sensible debe filtrar por `tenantId`.
+- No cambiar planes comerciales sin explicarlo.
+- No romper demos: deben seguir sirviendo para vender y probar.
+- Si agregas pantalla nueva, documentala.
+- Si agregas API nueva, explica seguridad y ejemplo.
+
+## Checklist de Pull Request
+
+- [ ] Explique que problema resuelve.
+- [ ] Agregue capturas si cambia UI.
+- [ ] Actualice documentacion si cambio comportamiento.
+- [ ] Verifique `npm run lint`.
+- [ ] Verifique `npm run build`.
+- [ ] No agregue credenciales reales.
+- [ ] Revise que el cambio respeta `tenantId`.
+
+## Para vibecoders
+
+Si usas Claude, Codex, Gemini, Cursor, Windsurf o Antigravity, dale este contexto al agente:
+
+```text
+Estoy colaborando en Capi Pedidos SaaS.
+Lee README.md, CONTRIBUTING.md, docs/DOCUMENTACION_TECNICA.md y docs/MANUAL_DE_USO.md.
+No subas secretos.
+Mant?n UI en espa?ol Mexico.
+No mezcles cambios no relacionados.
+Ejecuta lint/build y resume archivos cambiados.
 ```
-
-3. Instala dependencias:
-
-```bash
-npm install
-```
-
-4. Copia variables:
-
-```bash
-cp .env.example .env
-```
-
-En Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-5. Corre validaciones:
-
-```bash
-npm run lint
-npm run build
-```
-
-6. Abre Pull Request con:
-
-- Que problema resuelve.
-- Que archivos toca.
-- Como se probo.
-- Capturas si cambia UI.
-
-## Convenciones
-
-- Idioma de UI y documentacion: espanol Mexico.
-- Moneda: pesos mexicanos.
-- Formato de numeros: `es-MX`.
-- Evitar textos en ingles en pantallas visibles al usuario final.
-- Mantener multi-tenant: toda consulta operativa debe respetar `tenantId`.
-- No asumir que todos los restaurantes quieren usar caja/POS; esos modulos deben ser opcionales.
-
-## Areas donde se agradece ayuda
-
-- Mejoras de UI/UX para menus publicos.
-- Accesibilidad y responsive.
-- Pruebas automatizadas.
-- Seguridad de login, rate limiting y auditoria.
-- Inventario, recetas, costos y merma.
-- QR por mesa y comandas por area.
-- PWA y modo offline parcial.
-- Integraciones de pago y facturacion.

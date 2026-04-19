@@ -90,7 +90,7 @@ export default async function CategoriesPage() {
                       <option value="">Usar área: {printerAreaLabel[category.printerArea]}</option>
                       {stations.map((station) => (
                         <option key={station.id} value={station.id}>
-                          {station.name} · {printerAreaLabel[station.area]}{station.deviceName ? ` · ${station.deviceName}` : ""}
+                          {station.name} - {printerAreaLabel[station.area]}{station.deviceName ? ` - ${station.deviceName}` : ""}
                         </option>
                       ))}
                     </select>

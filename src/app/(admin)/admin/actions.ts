@@ -15,8 +15,10 @@ import {
   Version,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireAuthSession } from "@/lib/auth";
 import { resetDemoTenantData } from "@/lib/demo-reset";
+import { generateExportToken, hashExportToken, tokenPrefix } from "@/lib/export-tokens";
 import { applyPlanLimits, planLimits } from "@/lib/plan-limits";
 import { createSalePrintJob } from "@/lib/print-jobs";
 import { prisma } from "@/lib/prisma";
@@ -1078,4 +1080,44 @@ export async function resetDemoTenantAction(formData: FormData) {
   revalidatePath("/admin/orders");
   revalidatePath("/admin/cash");
   revalidatePath("/admin/kitchen");
+}
+
+export async function createExportCredentialAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const name = String(formData.get("name") ?? "Conexion de reportes").trim();
+  const expiresAtRaw = String(formData.get("expiresAt") ?? "").trim();
+  const token = generateExportToken();
+
+  await prisma.exportCredential.create({
+    data: {
+      tenantId: session.user.tenantId,
+      name: name || "Conexion de reportes",
+      tokenHash: hashExportToken(token),
+      tokenPrefix: tokenPrefix(token),
+      expiresAt: expiresAtRaw ? new Date(`${expiresAtRaw}T23:59:59`) : null,
+      createdByUserId: session.user.id,
+    },
+  });
+
+  revalidatePath("/admin/reportes");
+  redirect(`/admin/reportes?nuevoToken=${encodeURIComponent(token)}`);
+}
+
+export async function revokeExportCredentialAction(formData: FormData) {
+  const session = await requireAuthSession();
+  const credentialId = String(formData.get("credentialId") ?? "");
+  if (!credentialId) return;
+
+  await prisma.exportCredential.updateMany({
+    where: {
+      id: credentialId,
+      tenantId: session.user.tenantId,
+      revokedAt: null,
+    },
+    data: {
+      revokedAt: new Date(),
+    },
+  });
+
+  revalidatePath("/admin/reportes");
 }

@@ -62,3 +62,11 @@
 - Documentacion tecnica, manual de uso, guia de contribucion y seguridad.
 - Sanitizacion de credenciales para repositorio publico.
 
+## v0.098
+
+- Se agrego modulo Admin > Reportes para crear y revocar tokens de ventas.
+- Se agrego endpoint CSV/JSON para Excel, PowerBI e integraciones externas.
+- Se agregaron logs de auditoria de exportaciones.
+- Se documentaron About de GitHub, ramas, colaboracion, licencia, impresion local y reportes.
+- Se limpiaron caracteres problematicos en seeds y separadores visuales que podian romperse en tickets.
+- Se agregaron templates de issues y pull requests para colaboracion publica.

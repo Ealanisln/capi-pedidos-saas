@@ -233,7 +233,7 @@ export default function Home() {
             <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#057564]/20 bg-white/75 px-4 py-2 shadow-sm backdrop-blur">
               <span className="h-2.5 w-2.5 rounded-full bg-[#06d6a0]" />
               <span className="text-xs font-black uppercase tracking-[0.22em] text-[#057564]">
-                Rafael Noh · Soluciones Tecnológicas Playa del Carmen
+                Rafael Noh - Soluciones Tecnológicas Playa del Carmen
               </span>
             </div>
             <h1 className="mt-7 max-w-5xl font-[family-name:var(--font-display)] text-5xl font-black leading-[0.88] tracking-[-0.06em] text-[#13201d] sm:text-6xl md:text-8xl">
@@ -271,7 +271,7 @@ export default function Home() {
             <div className="absolute -left-4 top-8 hidden rounded-[2rem] bg-[#13201d] p-4 text-white shadow-2xl shadow-[#13201d]/25 md:block">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-[#9cf2df]">Caja hoy</p>
               <p className="mt-2 text-3xl font-black">$18,420</p>
-              <p className="text-xs text-white/70">Ventas demo · 43 pedidos</p>
+              <p className="text-xs text-white/70">Ventas demo - 43 pedidos</p>
             </div>
             <div className="absolute -right-3 bottom-10 hidden rotate-3 rounded-[2rem] bg-[#ffe9a7] p-4 text-[#3a2600] shadow-xl md:block">
               <p className="text-xs font-black uppercase tracking-[0.2em]">Cocina</p>
@@ -283,7 +283,7 @@ export default function Home() {
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.22em] text-[#9cf2df]">Vista cliente</p>
                     <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-black leading-none">Taquería Don José</h2>
-                    <p className="mt-2 text-sm font-semibold text-white/65">Abierto · Pedidos por WhatsApp</p>
+                    <p className="mt-2 text-sm font-semibold text-white/65">Abierto - Pedidos por WhatsApp</p>
                   </div>
                   <span className="rounded-full bg-[#9cf2df] px-3 py-1 text-xs font-black text-[#06332b]">Pro</span>
                 </div>
@@ -316,7 +316,7 @@ export default function Home() {
                     <p className="font-black">Tu pedido</p>
                     <p className="text-sm font-black">$130.00</p>
                   </div>
-                  <p className="mt-1 text-sm font-semibold text-[#667873]">3 productos · listo para WhatsApp</p>
+                  <p className="mt-1 text-sm font-semibold text-[#667873]">3 productos - listo para WhatsApp</p>
                   <div className="mt-4 rounded-2xl bg-[#06d6a0] px-4 py-3 text-center text-sm font-black text-[#06332b]">
                     Enviar pedido
                   </div>

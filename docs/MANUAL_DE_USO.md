@@ -593,3 +593,63 @@ Al correr `npm run db:seed`, las demos quedan listas para enseñar y vender:
 - Cortes históricos.
 
 Los tenants demo se reinician automáticamente según su configuración, normalmente cada 5 días, o manualmente desde el panel del super administrador.
+
+## Manual de reportes para Excel y PowerBI
+
+Los reportes sirven para que el restaurante analice sus ventas fuera de Capi, por ejemplo en Excel, PowerBI o con ayuda de una IA.
+
+### Crear token
+
+1. Entra al panel administrador.
+2. Abre Reportes.
+3. Escribe un nombre como Excel gerencia o PowerBI contador.
+4. Opcionalmente selecciona fecha de vencimiento.
+5. Presiona Crear token de ventas.
+6. Copia el token. Solo se muestra una vez.
+
+### Conectar Excel
+
+1. Abre Excel.
+2. Entra a Datos > Obtener datos > Desde web.
+3. Pega la URL CSV que aparece en Reportes.
+4. Carga la tabla.
+5. Crea tabla dinamica por fecha, metodo de pago, productos o mesero.
+
+### Conectar PowerBI
+
+1. Abre PowerBI Desktop.
+2. Elige Obtener datos > Web.
+3. Pega la URL CSV.
+4. Usa conexion anonima porque el token ya va en la URL.
+5. Transforma columnas si lo necesitas.
+6. Crea visuales de ventas, propinas, cancelaciones y productos.
+
+### Revocar token
+
+Si un archivo se compartio mal o una computadora ya no pertenece al restaurante:
+
+1. Entra a Reportes.
+2. Busca el token por nombre o prefijo.
+3. Presiona Revocar.
+4. Crea un token nuevo.
+
+## Manual rapido por rol
+
+| Rol | Que puede hacer |
+|---|---|
+| Super admin | Crear restaurantes, cambiar planes, vigencias, demos y reinicios. |
+| Admin restaurante | Productos, categorias, pedidos, caja, mesas, meseros, impresion, reportes y configuracion. |
+| Cajero | Cobrar pedidos, abrir/cerrar caja, registrar movimientos y precortes. |
+| Mesero | Levantar pedidos en mesas segun permisos. |
+| Cocina | Ver pedidos y cambiar estados de preparacion. |
+
+## Manual de impresion para restaurantes
+
+1. En Configuracion define mensaje del ticket, WiFi, propina y redes sociales.
+2. En Impresion crea estaciones: caja, cocina, barra o general.
+3. En Categorias asigna donde se imprime cada categoria.
+4. Instala Capi Print Bridge en la computadora local.
+5. Prueba con un pedido demo.
+6. Si no imprime, revisa token, nombre de impresora y que el puente este abierto.
+
+Guia tecnica completa: docs/IMPRESION_LOCAL.md.

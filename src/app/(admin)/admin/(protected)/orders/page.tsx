@@ -152,8 +152,8 @@ export default async function OrdersPage() {
                       </span>
                     </div>
                     <p className="mt-1 text-sm text-slate-600">
-                      {order.customerName || "Cliente"} · {serviceLabel[order.serviceType]}
-                      {order.tableName ? ` · ${order.tableName}` : ""}
+                      {order.customerName || "Cliente"} - {serviceLabel[order.serviceType]}
+                      {order.tableName ? ` - ${order.tableName}` : ""}
                     </p>
                     <p className="mt-1 text-sm font-black text-slate-950">{formatMoney(order.total)}</p>
                   </div>

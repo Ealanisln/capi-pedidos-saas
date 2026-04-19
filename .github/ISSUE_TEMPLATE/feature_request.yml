@@ -1,0 +1,36 @@
+name: Solicitud de mejora
+description: Propone una nueva funcion o mejora
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: Que problema resuelve
+      description: Explica el dolor real del restaurante o usuario.
+    validations:
+      required: true
+  - type: textarea
+    id: propuesta
+    attributes:
+      label: Propuesta
+      description: Describe como imaginas la solucion.
+    validations:
+      required: true
+  - type: dropdown
+    id: plan
+    attributes:
+      label: Plan donde aplica
+      options:
+        - Lite
+        - Pro
+        - Enterprise
+        - Todos
+        - No estoy seguro
+    validations:
+      required: true
+  - type: textarea
+    id: referencias
+    attributes:
+      label: Referencias o ejemplos
+      description: Puedes pegar links o describir sistemas similares.

@@ -196,7 +196,7 @@ export default async function AdminHomePage() {
               return (
                 <article key={demo.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
                   <p className="font-black text-slate-950">{demo.businessName}</p>
-                  <p className="text-xs font-semibold text-slate-500">{demo.version} · /{demo.slug}</p>
+                  <p className="text-xs font-semibold text-slate-500">{demo.version} - /{demo.slug}</p>
                   <p className="mt-3 text-2xl font-black text-slate-950">{formatMoney(demoSales)}</p>
                   <p className="text-sm text-slate-600">{formatNumber(demo.orders.length)} pedidos en 60 días</p>
                   <p className="text-sm text-slate-600">{formatNumber(demoCancelled)} cancelaciones</p>

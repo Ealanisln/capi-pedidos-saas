@@ -131,7 +131,7 @@ export default async function CashPage() {
     <div className="space-y-6">
       <section className="overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20">
         <div className="bg-[radial-gradient(circle_at_top_right,#34d399,transparent_26%),linear-gradient(135deg,#020617,#111827)] p-7">
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-300">Cobros del d�a</p>
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-300">Cobros del dia</p>
           <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <h2 className="text-4xl font-black tracking-tight">Caja</h2>
@@ -205,7 +205,7 @@ export default async function CashPage() {
                 <div className="rounded-2xl bg-slate-50 p-4"><p className="text-xs font-black text-slate-500">Transferencia</p><p className="text-xl font-black">{formatMoney(preview.transfer)}</p></div>
               </div>
               <div className="rounded-3xl bg-emerald-50 p-5 text-emerald-950">
-                <p className="text-xs font-black uppercase tracking-[0.18em]">Esperado en caj�n</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em]">Esperado en cajon</p>
                 <p className="mt-2 text-3xl font-black">{formatMoney(expectedCash)}</p>
               </div>
               <form action={createCashMovementAction} className="grid gap-2 rounded-3xl bg-slate-50 p-4 md:grid-cols-[150px_130px_1fr_1fr_auto]">
@@ -214,7 +214,7 @@ export default async function CashPage() {
                   {Object.values(CashMovementType).map((type) => <option key={type} value={type}>{movementLabel[type]}</option>)}
                 </select>
                 <input name="amount" type="number" min="0" step="0.01" placeholder="Monto" className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
-                <input name="category" placeholder="Categor�a" className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
+                <input name="category" placeholder="Categoria" className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
                 <input name="reason" placeholder="Motivo obligatorio" className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
                 <button className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-black text-white">Guardar</button>
               </form>
@@ -231,7 +231,7 @@ export default async function CashPage() {
 
       <section className="grid gap-4 xl:grid-cols-[1fr_1fr]">
         <article className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5">
-          <h3 className="text-xl font-black text-slate-950">Resumen por m�todo de pago</h3>
+          <h3 className="text-xl font-black text-slate-950">Resumen por metodo de pago</h3>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {Object.values(PaymentMethod).map((method) => (
               <div key={method} className="rounded-3xl bg-slate-50 p-4">
@@ -246,8 +246,8 @@ export default async function CashPage() {
           <div className="mt-4 space-y-2">
             {movements.length === 0 ? <p className="text-sm text-slate-600">Sin movimientos.</p> : movements.map((movement) => (
               <div key={movement.id} className="rounded-2xl bg-slate-50 p-3 text-sm">
-                <p className="font-black text-slate-950">{movementLabel[movement.type]} � {formatMoney(movement.amount)}</p>
-                <p className="text-slate-600">{movement.reason} � {movement.cashSession.drawer.name}</p>
+                <p className="font-black text-slate-950">{movementLabel[movement.type]} - {formatMoney(movement.amount)}</p>
+                <p className="text-slate-600">{movement.reason} - {movement.cashSession.drawer.name}</p>
               </div>
             ))}
           </div>
@@ -256,10 +256,10 @@ export default async function CashPage() {
 
       <section className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5">
         <h3 className="text-xl font-black text-slate-950">Pedidos y cobros</h3>
-        <p className="mt-1 text-sm text-slate-600">Efectivo es el m�todo predeterminado. Para pago mixto se registrar�n partidas separadas en el siguiente bloque visual.</p>
+        <p className="mt-1 text-sm text-slate-600">Efectivo es el metodo predeterminado. Para pago mixto se registraran partidas separadas en el siguiente bloque visual.</p>
         <div className="mt-5 grid gap-3">
           {orders.length === 0 ? (
-            <p className="text-sm text-slate-600">A�n no hay pedidos hoy.</p>
+            <p className="text-sm text-slate-600">Aun no hay pedidos hoy.</p>
           ) : (
             orders.map((order) => (
               <article key={order.id} className="rounded-3xl border border-slate-200 bg-white p-4">
@@ -267,8 +267,8 @@ export default async function CashPage() {
                   <div>
                     <p className="text-lg font-black text-slate-950">{order.orderNumber}</p>
                     <p className="text-sm text-slate-600">
-                      {order.customerName || "Cliente"} � {serviceLabel[order.serviceType]}
-                      {order.table?.name ? ` � ${order.table.name}` : order.tableName ? ` � ${order.tableName}` : ""}
+                      {order.customerName || "Cliente"} - {serviceLabel[order.serviceType]}
+                      {order.table?.name ? ` - ${order.table.name}` : order.tableName ? ` - ${order.tableName}` : ""}
                     </p>
                     <p className="mt-1 text-sm font-black text-slate-950">{formatMoney(order.total)}</p>
                     {order.lockStatus !== OrderLockStatus.ABIERTA ? (
@@ -319,7 +319,7 @@ export default async function CashPage() {
       </section>
 
       <section className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5">
-        <h3 className="text-xl font-black text-slate-950">�ltimos turnos de caja</h3>
+        <h3 className="text-xl font-black text-slate-950">Ultimos turnos de caja</h3>
         <div className="mt-4 space-y-2">
           {recentSessions.map((cashSession) => (
             <div key={cashSession.id} className="grid gap-2 rounded-2xl bg-slate-50 p-4 text-sm md:grid-cols-4">

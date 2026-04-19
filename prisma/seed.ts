@@ -1,6 +1,7 @@
 import { PrismaClient, PrinterArea, PublicTemplate, TableStatus, UserRole, Version } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { resetDemoTenantData } from "../src/lib/demo-reset";
+import { hashExportToken, tokenPrefix } from "../src/lib/export-tokens";
 import { applyPlanLimits, planLimits } from "../src/lib/plan-limits";
 
 const prisma = new PrismaClient();
@@ -225,6 +226,29 @@ async function ensureUser(options: {
   });
 }
 
+async function ensureDemoExportCredential(options: {
+  tenantId: string;
+  name: string;
+  token: string;
+}) {
+  await prisma.exportCredential.upsert({
+    where: { tokenHash: hashExportToken(options.token) },
+    update: {
+      tenantId: options.tenantId,
+      name: options.name,
+      tokenPrefix: tokenPrefix(options.token),
+      revokedAt: null,
+      expiresAt: null,
+    },
+    create: {
+      tenantId: options.tenantId,
+      name: options.name,
+      tokenHash: hashExportToken(options.token),
+      tokenPrefix: tokenPrefix(options.token),
+    },
+  });
+}
+
 async function ensureOperationalDemoData(options: {
   tenantId: string;
   slug: string;
@@ -289,7 +313,7 @@ async function ensureOperationalDemoData(options: {
 
   const categories = await prisma.category.findMany({ where: { tenantId: options.tenantId } });
   for (const category of categories) {
-    const isDrink = /bebida|cafe|cafÒ©|coctel|limónada|naranjada|refresco|agua/i.test(`${category.name} ${category.slug}`);
+    const isDrink = /bebida|cafe|cafe|coctel|limónada|naranjada|refresco|agua/i.test(`${category.name} ${category.slug}`);
     const area = isDrink ? PrinterArea.BARRA : PrinterArea.COCINA;
     await prisma.category.update({
       where: { id: category.id },
@@ -317,15 +341,15 @@ async function ensureOperationalDemoData(options: {
   }
 
   const waiterNames = [
-    "Ana LÒ³pez",
-    "Luis HernÒ¡ndez",
-    "MarÒ­a GonzÒ¡lez",
+    "Ana Lopez",
+    "Luis Hernandez",
+    "Maria Gonzalez",
     "Carlos Chan",
-    "Diana MÒ©ndez",
-    "JosÒ© Pech",
+    "Diana Mendez",
+    "Jose Pech",
     "Fernanda Ruiz",
     "Roberto Torres",
-    "Paola SÒ¡nchez",
+    "Paola Sanchez",
     "Miguel Castillo",
   ];
   for (let index = 1; index <= waiterCount; index += 1) {
@@ -339,7 +363,7 @@ async function ensureOperationalDemoData(options: {
   }
 
   for (let index = 1; index <= tableCount; index += 1) {
-    const area = index <= Math.ceil(tableCount * 0.65) ? "SalÒ³n" : index <= Math.ceil(tableCount * 0.85) ? "Terraza" : "Barra";
+    const area = index <= Math.ceil(tableCount * 0.65) ? "Salon" : index <= Math.ceil(tableCount * 0.85) ? "Terraza" : "Barra";
     await prisma.diningTable.upsert({
       where: { tenantId_slug: { tenantId: options.tenantId, slug: `mesa_${index}` } },
       update: {
@@ -703,7 +727,7 @@ async function main() {
         maxSelection: 3,
         modifiers: [
           { name: "Queso extra", price: 12 },
-          { name: "PiÒ±a extra", price: 5 },
+          { name: "Pina extra", price: 5 },
           { name: "Salsa especial", price: 4 },
         ],
       },
@@ -879,6 +903,22 @@ async function main() {
     name: "Demo Pizza",
     role: UserRole.ADMIN,
     tenantId: pizzaTenant.id,
+  });
+
+  await ensureDemoExportCredential({
+    tenantId: liteTenant.id,
+    name: "Demo Excel ventas - Fonda Lupita",
+    token: "demo_fonda_lupita_ventas_2026",
+  });
+  await ensureDemoExportCredential({
+    tenantId: proTenant.id,
+    name: "Demo PowerBI ventas - Taqueria Don Jose",
+    token: "demo_taqueria_don_jose_ventas_2026",
+  });
+  await ensureDemoExportCredential({
+    tenantId: enterpriseTenant.id,
+    name: "Demo BI ventas - Grupo Nopal",
+    token: "demo_grupo_nopal_ventas_2026",
   });
 
   await ensureOperationalDemoData({

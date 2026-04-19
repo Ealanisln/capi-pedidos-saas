@@ -1,1 +1,13 @@
-﻿tools/capi-print-bridge/
+.env
+.env.*
+!.env.example
+.vercel/
+.claude/
+tools/capi-print-bridge/
+node_modules/
+.next/
+out/
+build/
+coverage/
+.turbo/
+*.log

@@ -119,7 +119,7 @@ export default async function TicketPage({ params, searchParams }: TicketPagePro
       <div className="mx-auto mb-4 flex max-w-3xl flex-wrap items-center justify-between gap-3 print:hidden">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Vista previa</p>
-          <h1 className="text-2xl font-black">{isProduction ? `Ticket de producción · ${areaLabel[area]}` : "Ticket de venta"}</h1>
+          <h1 className="text-2xl font-black">{isProduction ? `Ticket de producción - ${areaLabel[area]}` : "Ticket de venta"}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/admin/orders" className="rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-700">
@@ -138,7 +138,7 @@ export default async function TicketPage({ params, searchParams }: TicketPagePro
 
         <div className="my-3 border-y border-dashed border-slate-400 py-2 text-center">
           <p className="text-lg font-black">{order.orderNumber}</p>
-          <p className="font-black uppercase">{isProduction ? `Producción · ${areaLabel[area]}` : "Ticket de venta"}</p>
+          <p className="font-black uppercase">{isProduction ? `Producción - ${areaLabel[area]}` : "Ticket de venta"}</p>
         </div>
 
         <div className="space-y-1">

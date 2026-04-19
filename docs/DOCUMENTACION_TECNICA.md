@@ -525,3 +525,48 @@ Si el negocio sólo tiene una impresora, puede registrar una estación general o
 - Cortes históricos.
 
 Esto permite probar la operación sin capturar datos manuales después de correr `npm run db:seed`.
+
+## Reportes con token para Excel y PowerBI
+
+Capi incluye una capa de exportacion por restaurante para que Excel, PowerBI, agentes de IA o integraciones externas puedan leer ventas sin usar usuario y contrasena del panel.
+
+### Modelos nuevos
+
+| Modelo | Proposito |
+|---|---|
+| ExportCredential | Guarda tokens hasheados por tenant, scope, vigencia y estado. |
+| ExportAuditLog | Registra cada consulta de reportes: formato, filas, IP y user-agent. |
+| ExportScope | Enum de alcance. Actualmente soporta VENTAS. |
+
+### Seguridad
+
+- El token plano solo se muestra una vez al crearlo.
+- En base de datos se guarda SHA-256, no el token original.
+- Cada token pertenece a un tenant especifico.
+- El endpoint valida slug, token, estado activo, revocacion y vencimiento.
+- Las respuestas usan Cache-Control: no-store.
+- CSV protege contra formulas maliciosas iniciadas con =, +, - o @.
+
+### Endpoint
+
+```text
+GET /api/reportes/[slug]/ventas?token=TOKEN&formato=csv&desde=2026-03-01&hasta=2026-04-19
+```
+
+| Parametro | Uso |
+|---|---|
+| slug | Slug del restaurante. |
+| token | Token privado creado desde Admin > Reportes. |
+| formato | csv o json. |
+| desde | Fecha inicial. Si se omite, toma los ultimos 60 dias. |
+| hasta | Fecha final. Si se omite, toma hoy. |
+
+El rango se limita a 366 dias para evitar consultas pesadas.
+
+### Pagina admin
+
+```text
+/admin/reportes
+```
+
+Permite crear, revocar y auditar tokens de reportes.
