@@ -379,7 +379,25 @@ export async function markOrderPaidAction(formData: FormData) {
   const session = await requireAuthSession();
   const orderId = String(formData.get("orderId") ?? "");
   const method = parsePaymentMethod(String(formData.get("paymentMethod") ?? "EFECTIVO"));
+  const amountReceivedRaw = String(formData.get("amountReceived") ?? "").trim();
   if (!orderId) return;
+
+  const order = await prisma.order.findFirst({
+    where: {
+      id: orderId,
+      tenantId: session.user.tenantId,
+    },
+    select: { total: true },
+  });
+
+  if (!order) return;
+
+  const total = Number(order.total);
+  const amountReceived =
+    method === PaymentMethod.EFECTIVO && amountReceivedRaw
+      ? Math.max(Number(amountReceivedRaw) || 0, total)
+      : total;
+  const changeDue = method === PaymentMethod.EFECTIVO ? Math.max(amountReceived - total, 0) : 0;
 
   const result = await prisma.order.updateMany({
     where: {
@@ -389,6 +407,8 @@ export async function markOrderPaidAction(formData: FormData) {
     data: {
       paymentStatus: PaymentStatus.PAGADO,
       paymentMethod: method,
+      amountReceived: new Prisma.Decimal(amountReceived),
+      changeDue: new Prisma.Decimal(changeDue),
       paidAt: new Date(),
     },
   });
@@ -415,6 +435,8 @@ export async function markOrderUnpaidAction(formData: FormData) {
     data: {
       paymentStatus: PaymentStatus.PENDIENTE,
       paymentMethod: null,
+      amountReceived: null,
+      changeDue: null,
       paidAt: null,
     },
   });

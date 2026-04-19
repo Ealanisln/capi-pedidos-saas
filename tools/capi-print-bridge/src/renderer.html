@@ -1,0 +1,29 @@
+﻿<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <title>Capi Print Bridge</title>
+  <style>
+    body { margin: 0; font-family: Segoe UI, sans-serif; background: #0f172a; color: #e2e8f0; }
+    main { padding: 28px; }
+    h1 { margin: 0; font-size: 30px; }
+    p { color: #94a3b8; }
+    .panel { margin-top: 22px; border: 1px solid #334155; border-radius: 22px; background: #111827; padding: 18px; }
+    .line { padding: 10px 0; border-bottom: 1px solid #1f2937; font-family: Consolas, monospace; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Capi Print Bridge</h1>
+    <p>Monitor local de impresion silenciosa para caja, cocina y barra.</p>
+    <section class="panel" id="log">
+      <div class="line">Esperando trabajos de impresion...</div>
+    </section>
+  </main>
+  <script>
+    window.bridge.onLog((lines) => {
+      document.getElementById("log").innerHTML = lines.map((line) => `<div class="line">${line}</div>`).join("");
+    });
+  </script>
+</body>
+</html>

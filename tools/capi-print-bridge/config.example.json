@@ -1,0 +1,28 @@
+﻿{
+  "appUrl": "https://capi.nohmendez.xyz",
+  "tenantSlug": "capibara",
+  "token": "PEGA_AQUI_PRINT_BRIDGE_TOKEN",
+  "pollEveryMs": 2500,
+  "areas": {
+    "CAJA": {
+      "enabled": true,
+      "printerName": "",
+      "copies": 1
+    },
+    "COCINA": {
+      "enabled": true,
+      "printerName": "",
+      "copies": 1
+    },
+    "BARRA": {
+      "enabled": true,
+      "printerName": "",
+      "copies": 1
+    },
+    "GENERAL": {
+      "enabled": true,
+      "printerName": "",
+      "copies": 1
+    }
+  }
+}

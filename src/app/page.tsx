@@ -57,7 +57,7 @@ const plans = [
       "Caja y cortes del día",
       "Soporte prioritario",
     ],
-    bestFor: "Dark kitchens, grupos restauranteros y alto volumen.",
+    bestFor: "Cocinas fantasma, grupos restauranteros y alto volumen.",
     demoMenu: "/grupo_nopal",
     demoAdmin: "/admin/login?demo=enterprise",
     accent: "bg-[#ffb47d] text-[#401500]",
@@ -170,7 +170,7 @@ const featureBlocks = [
   },
 ];
 
-const themes = ["Taquería", "Marisquería", "Cafetería", "Pizzería", "Sushi", "Hamburguesas", "Antojitos", "Bar botanero", "Dark kitchen", "Pollería"];
+const themes = ["Taquería", "Marisquería", "Cafetería", "Pizzería", "Sushi", "Hamburguesas", "Antojitos", "Bar botanero", "Cocina fantasma", "Pollería"];
 
 const externalLinks = [
   {

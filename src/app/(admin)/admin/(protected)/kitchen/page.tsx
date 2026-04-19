@@ -124,20 +124,6 @@ export default async function KitchenPage() {
                         >
                           Ticket barra
                         </Link>
-                        <Link
-                          href={`/admin/orders/${order.id}/ticket?type=production&area=COCINA`}
-                          target="_blank"
-                          className="rounded-xl border border-amber-300 bg-white px-4 py-2 text-sm font-black text-amber-800"
-                        >
-                          Ticket cocina
-                        </Link>
-                        <Link
-                          href={`/admin/orders/${order.id}/ticket?type=production&area=BARRA`}
-                          target="_blank"
-                          className="rounded-xl border border-sky-300 bg-white px-4 py-2 text-sm font-black text-sky-800"
-                        >
-                          Ticket barra
-                        </Link>
                         {status !== OrderStatus.PREPARING ? (
                           <form action={updateOrderStatusAction}>
                             <input type="hidden" name="orderId" value={order.id} />

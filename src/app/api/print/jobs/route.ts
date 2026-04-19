@@ -92,6 +92,8 @@ export async function GET(request: Request) {
       order: job.order,
       ticketPath: buildTicketPath(job.orderId, job.type, job.area),
       ticketUrl: `${origin}${buildTicketPath(job.orderId, job.type, job.area)}`,
+      ticketHtmlPath: `/api/print/jobs/${job.id}/ticket`,
+      ticketHtmlUrl: `${origin}/api/print/jobs/${job.id}/ticket`,
       attempts: job.attempts + 1,
       createdAt: job.createdAt,
     })),

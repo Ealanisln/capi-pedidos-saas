@@ -1,5 +1,14 @@
 ﻿# Changelog
 
+## v0.096 - Puente local de impresion y tickets de caja
+
+- App local `Capi Print Bridge` basada en Electron para impresion silenciosa por caja, cocina, barra y general.
+- Ruta protegida para HTML de tickets del puente local sin iniciar sesion de administrador.
+- API de cola ahora devuelve `ticketHtmlUrl` para imprimir desde el puente.
+- Tickets de venta con total en letras, monto recibido y cambio.
+- Caja permite capturar monto recibido en pagos en efectivo.
+- Correccion de botones duplicados de tickets en cocina y caja.
+- Revision de textos visibles para mantenerlos en espanol Mexico.
 ## v0.095 - Cola de impresion y puente local
 
 - Cola de trabajos de impresion por restaurante para tickets de venta y produccion.
@@ -41,6 +50,4 @@
 - Seeds demo realistas para negocios de comida en Mexico.
 - Documentacion tecnica, manual de uso, guia de contribucion y seguridad.
 - Sanitizacion de credenciales para repositorio publico.
-
-
 

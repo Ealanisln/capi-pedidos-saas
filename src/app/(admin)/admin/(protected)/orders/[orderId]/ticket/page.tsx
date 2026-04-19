@@ -1,8 +1,9 @@
 ﻿import Link from "next/link";
-import { PrinterArea, ServiceType, TicketPaperWidth } from "@prisma/client";
+import { PaymentMethod, PaymentStatus, PrinterArea, ServiceType, TicketPaperWidth } from "@prisma/client";
 import { TicketPrintButton } from "@/components/admin/ticket-print-button";
 import { requireAuthSession } from "@/lib/auth";
 import { formatMoney, formatNumber } from "@/lib/format";
+import { amountToWordsMx } from "@/lib/money-words";
 import { prisma } from "@/lib/prisma";
 
 type TicketPageProps = {
@@ -22,6 +23,19 @@ const areaLabel: Record<PrinterArea, string> = {
   COCINA: "Cocina",
   BARRA: "Barra",
   CAJA: "Caja",
+};
+
+const paymentStatusLabel: Record<PaymentStatus, string> = {
+  PENDIENTE: "Pendiente",
+  PAGADO: "Pagado",
+  CANCELADO: "Cancelado",
+};
+
+const paymentMethodLabel: Record<PaymentMethod, string> = {
+  EFECTIVO: "Efectivo",
+  TARJETA: "Tarjeta",
+  TRANSFERENCIA: "Transferencia",
+  OTRO: "Otro",
 };
 
 function parseArea(value?: string) {
@@ -161,8 +175,15 @@ export default async function TicketPage({ params, searchParams }: TicketPagePro
           <div className="border-t border-dashed border-slate-400 pt-2 text-right">
             <p>Subtotal: {formatMoney(order.subtotal)}</p>
             <p className="text-base font-black">Total: {formatMoney(order.total)}</p>
-            <p>Pago: {order.paymentStatus}</p>
-            {order.paymentMethod ? <p>Método: {order.paymentMethod}</p> : null}
+            <p className="text-left">Total en letras: {amountToWordsMx(order.total).toUpperCase()}</p>
+            <p>Pago: {paymentStatusLabel[order.paymentStatus]}</p>
+            {order.paymentMethod ? <p>Método: {paymentMethodLabel[order.paymentMethod]}</p> : null}
+            {order.paymentMethod === PaymentMethod.EFECTIVO && order.amountReceived ? (
+              <>
+                <p>Recibido: {formatMoney(order.amountReceived)}</p>
+                <p className="text-base font-black">Cambio: {formatMoney(order.changeDue)}</p>
+              </>
+            ) : null}
           </div>
         ) : null}
 

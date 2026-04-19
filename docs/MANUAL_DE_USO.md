@@ -459,3 +459,52 @@ Si falla:
   "error": "Impresora sin papel"
 }
 ```
+
+## 12. Puente local de impresion silenciosa
+
+Ruta del codigo: `tools/capi-print-bridge`
+
+Esta app local sirve para restaurantes que quieren imprimir automaticamente sin abrir el navegador ni presionar el boton de imprimir.
+
+### Que necesita el restaurante
+
+- Una computadora encendida en el negocio.
+- Impresoras instaladas en el sistema operativo.
+- Internet estable.
+- El archivo `config.json` con el restaurante, token y nombres de impresoras.
+
+### Configuracion basica
+
+1. Entrar a `tools/capi-print-bridge`.
+2. Copiar `config.example.json` como `config.json`.
+3. Configurar:
+
+| Campo | Que significa |
+| --- | --- |
+| `appUrl` | URL del SaaS, normalmente `https://capi.nohmendez.xyz`. |
+| `tenantSlug` | Slug del restaurante, por ejemplo `capibara`. |
+| `token` | Token privado de impresion. |
+| `pollEveryMs` | Cada cuantos milisegundos revisa pedidos nuevos. |
+| `printerName` | Nombre de la impresora instalada. Vacio usa predeterminada. |
+| `copies` | Cantidad de copias. |
+
+### Flujo diario
+
+1. El cliente realiza un pedido.
+2. Capi genera tickets pendientes.
+3. El puente local detecta el trabajo.
+4. La impresora de cocina/barra/caja imprime en silencio.
+5. El puente confirma si imprimio o si fallo.
+
+### Tickets de venta
+
+Al cobrar en efectivo, caja puede capturar el monto recibido. El ticket muestra:
+
+- Total.
+- Total en letras.
+- Monto recibido.
+- Cambio.
+
+### Botones manuales
+
+Aunque exista puente local, los botones manuales de ticket siguen disponibles como respaldo por si se acaba el papel, se desconecta la impresora o se necesita reimprimir.

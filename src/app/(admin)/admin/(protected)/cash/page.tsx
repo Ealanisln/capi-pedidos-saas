@@ -205,13 +205,6 @@ export default async function CashPage() {
                   >
                     Ticket venta
                   </Link>
-                  <Link
-                    href={`/admin/orders/${order.id}/ticket?type=sale`}
-                    target="_blank"
-                    className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700"
-                  >
-                    Ticket venta
-                  </Link>
                   {order.paymentStatus === PaymentStatus.PAGADO ? (
                     <form action={markOrderUnpaidAction}>
                       <input type="hidden" name="orderId" value={order.id} />
@@ -221,9 +214,19 @@ export default async function CashPage() {
                     </form>
                   ) : (
                     Object.values(PaymentMethod).map((method) => (
-                      <form key={method} action={markOrderPaidAction}>
+                      <form key={method} action={markOrderPaidAction} className="flex flex-wrap items-center gap-2 rounded-2xl bg-slate-50 p-2">
                         <input type="hidden" name="orderId" value={order.id} />
                         <input type="hidden" name="paymentMethod" value={method} />
+                        {method === PaymentMethod.EFECTIVO ? (
+                          <input
+                            name="amountReceived"
+                            type="number"
+                            min={Number(order.total)}
+                            step="0.01"
+                            placeholder="Recibido"
+                            className="w-28 rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                          />
+                        ) : null}
                         <button className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-black text-white">
                           Cobrar {paymentLabel[method]}
                         </button>

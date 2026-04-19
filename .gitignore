@@ -14,6 +14,10 @@ coverage/
 # Vercel
 .vercel/
 
+# Puente local de impresion
+tools/capi-print-bridge/config.json
+tools/capi-print-bridge/dist/
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

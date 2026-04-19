@@ -356,3 +356,59 @@ Crear `Capi Print Bridge`, una app local que:
 4. Descarga/renderiza el ticket.
 5. Imprime por ESC/POS, impresora del sistema o navegador local.
 6. Reporta `PRINTED` o `FAILED`.
+
+## 18. Capi Print Bridge local
+
+La version `v0.096` agrega una app local experimental en `tools/capi-print-bridge` para imprimir tickets en tiempo real.
+
+### Motivo tecnico
+
+Un despliegue en Vercel no puede hablar directamente con impresoras USB, Bluetooth o de red dentro del restaurante. Por eso se usa un puente local instalado en una computadora del negocio.
+
+### Arquitectura
+
+```mermaid
+flowchart LR
+  A[Pedido en Capi] --> B[PrintJob en Neon]
+  B --> C[Capi Print Bridge local]
+  C --> D[Ticket HTML protegido]
+  C --> E[Impresora caja]
+  C --> F[Impresora cocina]
+  C --> G[Impresora barra]
+  C --> H[POST PRINTED o FAILED]
+```
+
+### Rutas usadas
+
+| Ruta | Uso |
+| --- | --- |
+| `GET /api/print/jobs` | Lista trabajos pendientes por restaurante y area. |
+| `GET /api/print/jobs/[jobId]/ticket` | Devuelve HTML imprimible protegido por `PRINT_BRIDGE_TOKEN`. |
+| `POST /api/print/jobs` | Confirma `PRINTED` o `FAILED`. |
+
+### Seguridad
+
+- El puente usa `Authorization: Bearer <PRINT_BRIDGE_TOKEN>`.
+- No requiere sesion de administrador.
+- No debe publicarse `tools/capi-print-bridge/config.json`.
+- El archivo real de configuracion local esta ignorado por Git.
+
+### Impresion silenciosa
+
+Electron permite usar `webContents.print` con `silent: true`. El puente carga el HTML del ticket en una ventana oculta y manda imprimir sin mostrar dialogo.
+
+### Cobro y tickets
+
+`Order` ahora guarda:
+
+| Campo | Uso |
+| --- | --- |
+| `amountReceived` | Monto recibido del cliente al cobrar. |
+| `changeDue` | Cambio a entregar. |
+
+El ticket de venta muestra:
+
+- Total numerico.
+- Total en letras formato Mexico.
+- Metodo de pago en espanol.
+- Recibido y cambio cuando el pago fue en efectivo.

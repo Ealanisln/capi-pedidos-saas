@@ -209,6 +209,8 @@ model Order {
   tableName      String?
   paymentStatus  PaymentStatus  @default(PENDIENTE)
   paymentMethod  PaymentMethod?
+  amountReceived Decimal?       @db.Decimal(10, 2)
+  changeDue      Decimal?       @db.Decimal(10, 2)
   paidAt         DateTime?
   whatsappSent   Boolean        @default(false)
   whatsappSentAt DateTime?
