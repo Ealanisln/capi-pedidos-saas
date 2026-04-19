@@ -1,0 +1,1 @@
+﻿Ver AGENTS.md y docs/DOCUMENTACION_TECNICA.md.

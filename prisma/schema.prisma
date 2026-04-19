@@ -1,0 +1,275 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  STAFF
+}
+
+enum Version {
+  LITE
+  PRO
+  ENTERPRISE
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+enum PublicTemplate {
+  CLASICO
+  MERCADO
+  ELEGANTE
+  TAQUERIA
+  MARISQUERIA
+  CAFETERIA
+  PIZZERIA
+  SUSHI
+  HAMBURGUESAS
+  ANTOJITOS
+  BAR_BOTANERO
+  DARK_KITCHEN
+  POLLERIA
+}
+
+enum ServiceType {
+  MOSTRADOR
+  MESA
+  RECOGER
+  DOMICILIO
+}
+
+enum PaymentStatus {
+  PENDIENTE
+  PAGADO
+  CANCELADO
+}
+
+enum PaymentMethod {
+  EFECTIVO
+  TARJETA
+  TRANSFERENCIA
+  OTRO
+}
+
+model Tenant {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  name          String
+  subdomain     String?     @unique
+  customDomain  String?     @unique
+  businessName  String
+  whatsapp      String
+  version       Version     @default(LITE)
+  contractStartAt DateTime  @default(now())
+  contractEndAt   DateTime?
+  isDemo        Boolean     @default(false)
+  demoResetEveryDays Int    @default(5)
+  demoLastResetAt DateTime?
+  demoNextResetAt DateTime?
+  currency      String      @default("MXN")
+  timezone      String      @default("America/Cancun")
+  isActive      Boolean     @default(true)
+  users         User[]
+  categories    Category[]
+  products      Product[]
+  orders        Order[]
+  cashCuts      CashCut[]
+  settings      Settings?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model CashCut {
+  id              String    @id @default(cuid())
+  tenantId        String
+  tenant          Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  openedAt        DateTime
+  closedAt        DateTime  @default(now())
+  openingAmount   Decimal   @db.Decimal(10, 2) @default(0)
+  cashSales       Decimal   @db.Decimal(10, 2) @default(0)
+  cardSales       Decimal   @db.Decimal(10, 2) @default(0)
+  transferSales   Decimal   @db.Decimal(10, 2) @default(0)
+  otherSales      Decimal   @db.Decimal(10, 2) @default(0)
+  expectedAmount  Decimal   @db.Decimal(10, 2) @default(0)
+  countedAmount   Decimal   @db.Decimal(10, 2) @default(0)
+  difference      Decimal   @db.Decimal(10, 2) @default(0)
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([tenantId])
+  @@index([closedAt])
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  passwordHash String
+  role         UserRole  @default(ADMIN)
+  tenantId     String
+  tenant       Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([tenantId])
+}
+
+model Category {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String
+  position   Int       @default(0)
+  isActive   Boolean   @default(true)
+  tenantId   String
+  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  products   Product[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+model Product {
+  id              String      @id @default(cuid())
+  name            String
+  slug            String
+  description     String?
+  imageUrl        String?
+  price           Decimal     @db.Decimal(10, 2)
+  isAvailable     Boolean     @default(true)
+  requiresFilling Boolean     @default(false)
+  ingredients     Ingredient[]
+  modifierGroups  ModifierGroup[]
+  categoryId      String
+  category        Category    @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  tenantId        String
+  tenant          Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  orderItems      OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([categoryId])
+}
+
+model Order {
+  id             String       @id @default(cuid())
+  orderNumber    String       @unique
+  customerName   String?
+  customerPhone  String?
+  customerNotes  String?
+  subtotal       Decimal      @db.Decimal(10, 2)
+  total          Decimal      @db.Decimal(10, 2)
+  status         OrderStatus  @default(PENDING)
+  serviceType    ServiceType  @default(RECOGER)
+  tableName      String?
+  paymentStatus  PaymentStatus @default(PENDIENTE)
+  paymentMethod  PaymentMethod?
+  paidAt         DateTime?
+  whatsappSent   Boolean      @default(false)
+  whatsappSentAt DateTime?
+  tenantId       String
+  tenant         Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  items          OrderItem[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id              String    @id @default(cuid())
+  quantity        Int       @default(1)
+  unitPrice       Decimal   @db.Decimal(10, 2)
+  totalPrice      Decimal   @db.Decimal(10, 2)
+  productName     String
+  selectedFilling String?
+  selectedModifiers Json?
+  specialNotes    String?
+  productId       String?
+  product         Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  orderId         String
+  order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([orderId])
+}
+
+model Ingredient {
+  id         String    @id @default(cuid())
+  name       String
+  position   Int       @default(0)
+  productId  String
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([productId])
+}
+
+model ModifierGroup {
+  id            String      @id @default(cuid())
+  name          String
+  isRequired    Boolean     @default(false)
+  allowMultiple Boolean     @default(true)
+  minSelection  Int         @default(0)
+  maxSelection  Int?
+  position      Int         @default(0)
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  modifiers     Modifier[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([productId])
+}
+
+model Modifier {
+  id         String        @id @default(cuid())
+  name       String
+  price      Decimal       @db.Decimal(10, 2) @default(0)
+  position   Int           @default(0)
+  isActive   Boolean       @default(true)
+  groupId    String
+  group      ModifierGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([groupId])
+}
+
+model Settings {
+  id             String    @id @default(cuid())
+  welcomeMessage String?   @default("Bienvenido, arma tu pedido y te lo confirmamos por WhatsApp.")
+  minimumOrder   Decimal   @db.Decimal(10, 2) @default(0)
+  publicTemplate PublicTemplate @default(CLASICO)
+  facebookUrl    String?
+  instagramUrl   String?
+  tiktokUrl      String?
+  websiteUrl     String?
+  tenantId       String    @unique
+  tenant         Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
