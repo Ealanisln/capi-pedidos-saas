@@ -62,6 +62,13 @@
 - Documentacion tecnica, manual de uso, guia de contribucion y seguridad.
 - Sanitizacion de credenciales para repositorio publico.
 
+## v0.099
+
+- Se mejoro el responsive design de landing page con titulos fluidos, CTAs de ancho completo en celular y tarjetas mas compactas.
+- Se mejoro el layout movil del panel admin con navegacion horizontal, contenido sin overflow y barra de plan no invasiva.
+- Se ajustaron formularios y acciones de caja, pedidos, productos, categorias y reportes para evitar desbordes en celular.
+- Se agregaron reglas globales de proteccion contra overflow horizontal en textos, codigos, inputs y botones.
+
 ## v0.098
 
 - Se agrego modulo Admin > Reportes para crear y revocar tokens de ventas.

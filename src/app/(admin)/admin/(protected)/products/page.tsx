@@ -86,7 +86,7 @@ export default async function ProductsPage() {
               Plan LITE: puedes guardar URL de imagen, pero la vista publica prioriza diseño simple.
             </p>
           ) : null}
-          <button className="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white md:col-span-2">
+          <button className="rounded-lg bg-slate-900 px-4 py-3 font-semibold text-white md:col-span-2">
             Guardar producto
           </button>
         </form>
@@ -100,21 +100,21 @@ export default async function ProductsPage() {
           ) : (
             products.map((product) => (
               <div key={product.id} className="rounded-lg border border-slate-200 p-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                  <div className="min-w-0">
                     <p className="font-semibold text-slate-900">{product.name}</p>
                     <p className="text-sm text-slate-600">{product.category.name}</p>
                     <p className="text-sm font-semibold text-emerald-700">
                       {formatMoney(product.price)}
                     </p>
                     {product.imageUrl ? (
-                      <p className="mt-1 text-xs text-slate-500">Imagen: {product.imageUrl}</p>
+                      <p className="mt-1 break-all text-xs text-slate-500">Imagen: {product.imageUrl}</p>
                     ) : null}
                   </div>
                   <form action={toggleProductAvailabilityAction}>
                     <input type="hidden" name="productId" value={product.id} />
                     <button
-                      className={`rounded-lg px-3 py-2 text-sm font-semibold ${
+                      className={`w-full rounded-lg px-3 py-2 text-sm font-semibold sm:w-auto ${
                         product.isAvailable
                           ? "bg-emerald-600 text-white"
                           : "bg-rose-600 text-white"
@@ -124,7 +124,7 @@ export default async function ProductsPage() {
                     </button>
                   </form>
                 </div>
-                <form action={updateProductAction} className="mt-3 grid gap-2 md:grid-cols-5">
+                <form action={updateProductAction} className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-5">
                   <input type="hidden" name="productId" value={product.id} />
                   <input
                     name="name"
@@ -156,14 +156,14 @@ export default async function ProductsPage() {
                     placeholder="https://..."
                     className="rounded-lg border border-slate-300 px-2 py-1 text-sm"
                   />
-                  <button className="rounded-lg bg-slate-900 px-3 py-1 text-sm text-white">
+                  <button className="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">
                     Guardar cambios
                   </button>
                   <textarea
                     name="description"
                     defaultValue={product.description ?? ""}
                     placeholder="Descripcion"
-                    className="min-h-16 rounded-lg border border-slate-300 px-2 py-1 text-sm md:col-span-5"
+                    className="min-h-16 rounded-lg border border-slate-300 px-2 py-1 text-sm md:col-span-2 xl:col-span-5"
                   />
                 </form>
 
@@ -188,14 +188,14 @@ export default async function ProductsPage() {
                           ))}
                         </div>
                       )}
-                      <form action={addIngredientAction} className="flex gap-2">
+                      <form action={addIngredientAction} className="grid gap-2 sm:grid-cols-[1fr_auto]">
                         <input type="hidden" name="productId" value={product.id} />
                         <input
                           name="name"
                           placeholder="Ej. Cebolla"
                           className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
                         />
-                        <button className="rounded-lg bg-slate-900 px-3 py-1 text-sm text-white">
+                        <button className="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">
                           Agregar
                         </button>
                       </form>
@@ -208,7 +208,7 @@ export default async function ProductsPage() {
                       </p>
                       {product.modifierGroups.map((group) => (
                         <div key={group.id} className="rounded-lg border border-slate-200 p-2">
-                          <div className="flex items-center justify-between gap-2">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <p className="text-sm font-medium">
                               {group.name} {group.isRequired ? "(Obligatorio)" : "(Opcional)"}
                             </p>
@@ -231,7 +231,7 @@ export default async function ProductsPage() {
                               </form>
                             ))}
                           </div>
-                          <form action={addModifierAction} className="mt-2 flex gap-2">
+                          <form action={addModifierAction} className="mt-2 grid gap-2 sm:grid-cols-[1fr_6rem_auto]">
                             <input type="hidden" name="groupId" value={group.id} />
                             <input
                               name="name"
@@ -244,9 +244,9 @@ export default async function ProductsPage() {
                               min="0"
                               step="0.01"
                               placeholder="15"
-                              className="w-24 rounded-lg border border-slate-300 px-2 py-1 text-sm"
+                              className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
                             />
-                            <button className="rounded-lg bg-slate-900 px-3 py-1 text-sm text-white">
+                            <button className="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">
                               +
                             </button>
                           </form>

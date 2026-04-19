@@ -130,11 +130,11 @@ export default async function CashPage() {
   return (
     <div className="space-y-6">
       <section className="overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20">
-        <div className="bg-[radial-gradient(circle_at_top_right,#34d399,transparent_26%),linear-gradient(135deg,#020617,#111827)] p-7">
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-300">Cobros del dia</p>
+        <div className="bg-[radial-gradient(circle_at_top_right,#34d399,transparent_26%),linear-gradient(135deg,#020617,#111827)] p-5 sm:p-7">
+          <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-emerald-300 sm:text-xs sm:tracking-[0.24em]">Cobros del dia</p>
           <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="text-4xl font-black tracking-tight">Caja</h2>
+              <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Caja</h2>
               <p className="mt-2 text-sm text-slate-300">
                 Abre caja, cobra pedidos, registra entradas y salidas, revisa precorte y cierra turno.
               </p>
@@ -161,7 +161,7 @@ export default async function CashPage() {
               {formatNumber(drawers.length)} / {formatNumber(tenant?.maxCashDrawers ?? limits.cashDrawers)}
             </span>
           </div>
-          <form action={createCashDrawerAction} className="mt-4 flex gap-2">
+          <form action={createCashDrawerAction} className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto]">
             <input name="name" placeholder="Ej. Caja mostrador" className="min-w-0 flex-1 rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
             <button className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-black text-white">Agregar</button>
           </form>
@@ -280,14 +280,14 @@ export default async function CashPage() {
                   </span>
                 </div>
 
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">
                   <Link href={`/admin/orders/${order.id}/ticket?type=sale`} target="_blank" className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700">Ticket venta</Link>
                   <form action={lockOrderForPrecheckAction}>
                     <input type="hidden" name="orderId" value={order.id} />
                     <button className="rounded-xl border border-amber-300 px-4 py-2 text-sm font-black text-amber-800">Imprimir precuenta</button>
                   </form>
                   {order.lockStatus !== OrderLockStatus.ABIERTA ? (
-                    <form action={unlockOrderAction} className="flex gap-2">
+                    <form action={unlockOrderAction} className="grid gap-2 sm:flex">
                       <input type="hidden" name="orderId" value={order.id} />
                       <input type="hidden" name="reason" value="Reapertura autorizada desde caja" />
                       <button className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700">Reabrir</button>
@@ -299,7 +299,7 @@ export default async function CashPage() {
                       <button className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700">Marcar pendiente</button>
                     </form>
                   ) : (
-                    <form action={markOrderPaidAction} className="grid w-full gap-2 rounded-2xl bg-slate-50 p-2 md:grid-cols-[130px_120px_120px_1fr_auto]">
+                    <form action={markOrderPaidAction} className="grid w-full gap-2 rounded-2xl bg-slate-50 p-2 md:grid-cols-2 xl:grid-cols-[130px_120px_120px_1fr_auto]">
                       <input type="hidden" name="orderId" value={order.id} />
                       {openSession ? <input type="hidden" name="cashSessionId" value={openSession.id} /> : null}
                       <select name="paymentMethod" defaultValue="EFECTIVO" className="rounded-xl border border-slate-300 px-3 py-2 text-sm">

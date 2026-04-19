@@ -199,14 +199,14 @@ export default function Home() {
         <div className="absolute left-6 top-28 -z-10 h-28 w-28 rounded-full border-[18px] border-[#13201d]/10" />
         <div className="absolute bottom-16 right-8 -z-10 h-40 w-40 rotate-12 rounded-[2.5rem] bg-[#13201d]/5" />
 
-        <nav className="mx-auto flex w-full max-w-7xl items-center justify-between rounded-full border border-[#13201d]/10 bg-white/70 px-4 py-3 shadow-sm backdrop-blur md:px-5">
+        <nav className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 rounded-[1.75rem] border border-[#13201d]/10 bg-white/80 px-3 py-3 shadow-sm backdrop-blur sm:rounded-full md:px-5">
           <Link href="/" className="flex items-center gap-3" aria-label="Inicio Capi">
-            <span className="grid h-11 w-11 place-items-center rounded-full bg-[#13201d] text-lg font-black text-[#ffe9a7]">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#13201d] text-base font-black text-[#ffe9a7] sm:h-11 sm:w-11 sm:text-lg">
               Ca
             </span>
-            <span>
+            <span className="min-w-0">
               <span className="block text-base font-black leading-none">Capi</span>
-              <span className="text-xs font-bold text-[#56716b]">Menús digitales para vender</span>
+              <span className="hidden text-xs font-bold text-[#56716b] sm:block">Menús digitales para vender</span>
             </span>
           </Link>
           <div className="hidden items-center gap-2 md:flex">
@@ -222,42 +222,42 @@ export default function Home() {
           </div>
           <Link
             href="/taqueria_don_jose"
-            className="rounded-full bg-[#13201d] px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-white shadow-lg shadow-[#13201d]/15 transition hover:-translate-y-0.5 hover:bg-[#203731]"
+            className="shrink-0 rounded-full bg-[#13201d] px-3 py-3 text-[0.68rem] font-black uppercase tracking-[0.08em] text-white shadow-lg shadow-[#13201d]/15 transition hover:-translate-y-0.5 hover:bg-[#203731] sm:px-4 sm:text-xs sm:tracking-[0.16em]"
           >
             Ver demo
           </Link>
         </nav>
 
-        <div className="mx-auto grid w-full max-w-7xl gap-10 pb-16 pt-14 lg:grid-cols-[1.04fr_0.96fr] lg:items-center lg:pb-24 lg:pt-20">
-          <div>
+        <div className="mx-auto grid w-full max-w-7xl gap-10 pb-14 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)] lg:items-center lg:pb-24 lg:pt-20">
+          <div className="min-w-0">
             <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#057564]/20 bg-white/75 px-4 py-2 shadow-sm backdrop-blur">
               <span className="h-2.5 w-2.5 rounded-full bg-[#06d6a0]" />
-              <span className="text-xs font-black uppercase tracking-[0.22em] text-[#057564]">
+              <span className="text-[0.66rem] font-black uppercase tracking-[0.12em] text-[#057564] sm:text-xs sm:tracking-[0.22em]">
                 Rafael Noh - Soluciones Tecnológicas Playa del Carmen
               </span>
             </div>
-            <h1 className="mt-7 max-w-5xl font-[family-name:var(--font-display)] text-5xl font-black leading-[0.88] tracking-[-0.06em] text-[#13201d] sm:text-6xl md:text-8xl">
+            <h1 className="mt-7 max-w-5xl text-balance font-[family-name:var(--font-display)] text-[clamp(2.7rem,14vw,5.8rem)] font-black leading-[0.9] tracking-[-0.055em] text-[#13201d] md:text-[clamp(5.5rem,8vw,8rem)]">
               Menús digitales que sí se sienten listos para vender.
             </h1>
             <p className="mt-7 max-w-2xl text-lg font-semibold leading-8 text-[#3f5751] md:text-xl">
               Capi convierte el menú de un restaurante en una experiencia administrable: pedidos por WhatsApp,
               productos, extras, cocina, caja, demos por giro y planes claros para cada etapa del negocio.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
               <Link
                 href="#planes"
-                className="rounded-2xl bg-[#13201d] px-6 py-4 text-sm font-black uppercase tracking-[0.12em] text-white shadow-xl shadow-[#13201d]/20 transition hover:-translate-y-0.5 hover:bg-[#203731]"
+                className="rounded-2xl bg-[#13201d] px-6 py-4 text-center text-sm font-black uppercase tracking-[0.12em] text-white shadow-xl shadow-[#13201d]/20 transition hover:-translate-y-0.5 hover:bg-[#203731]"
               >
                 Ver planes
               </Link>
               <Link
                 href="#demos"
-                className="rounded-2xl border border-[#13201d]/15 bg-white px-6 py-4 text-sm font-black uppercase tracking-[0.12em] text-[#13201d] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#fffdf8]"
+                className="rounded-2xl border border-[#13201d]/15 bg-white px-6 py-4 text-center text-sm font-black uppercase tracking-[0.12em] text-[#13201d] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#fffdf8]"
               >
                 Probar demos
               </Link>
             </div>
-            <div className="mt-9 grid gap-3 sm:grid-cols-4">
+            <div className="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {proof.map((item) => (
                 <div key={item.label} className="rounded-3xl border border-white/80 bg-white/70 p-4 shadow-sm backdrop-blur">
                   <p className="font-[family-name:var(--font-display)] text-3xl font-black text-[#13201d]">{item.value}</p>
@@ -267,7 +267,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-xl">
+          <div className="relative mx-auto w-full max-w-xl min-w-0">
             <div className="absolute -left-4 top-8 hidden rounded-[2rem] bg-[#13201d] p-4 text-white shadow-2xl shadow-[#13201d]/25 md:block">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-[#9cf2df]">Caja hoy</p>
               <p className="mt-2 text-3xl font-black">$18,420</p>
@@ -282,7 +282,7 @@ export default function Home() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.22em] text-[#9cf2df]">Vista cliente</p>
-                    <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-black leading-none">Taquería Don José</h2>
+                    <h2 className="mt-2 text-balance font-[family-name:var(--font-display)] text-3xl font-black leading-none sm:text-4xl">Taquería Don José</h2>
                     <p className="mt-2 text-sm font-semibold text-white/65">Abierto - Pedidos por WhatsApp</p>
                   </div>
                   <span className="rounded-full bg-[#9cf2df] px-3 py-1 text-xs font-black text-[#06332b]">Pro</span>
@@ -333,7 +333,7 @@ export default function Home() {
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div className="max-w-3xl">
               <p className="text-xs font-black uppercase tracking-[0.28em] text-[#9cf2df]">Planes mensuales</p>
-              <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-black leading-none tracking-[-0.04em] md:text-6xl">
+              <h2 className="mt-4 text-balance font-[family-name:var(--font-display)] text-[clamp(2.35rem,10vw,4rem)] font-black leading-none tracking-[-0.04em] md:text-6xl">
                 Tres formas de vender mejor, sin prometer humo.
               </h2>
             </div>
@@ -362,8 +362,8 @@ export default function Home() {
                 </span>
                 <h3 className="mt-5 font-[family-name:var(--font-display)] text-4xl font-black">{plan.name}</h3>
                 <p className="mt-2 text-lg font-black">{plan.promise}</p>
-                <div className="mt-5 flex items-end gap-2">
-                  <p className="font-[family-name:var(--font-display)] text-6xl font-black tracking-[-0.05em]">{plan.price}</p>
+                <div className="mt-5 flex flex-wrap items-end gap-2">
+                  <p className="font-[family-name:var(--font-display)] text-5xl font-black tracking-[-0.05em] sm:text-6xl">{plan.price}</p>
                   <p className={`pb-3 text-sm font-extrabold ${plan.featured ? "text-[#637771]" : "text-white/55"}`}>{plan.period}</p>
                 </div>
                 <p className={`mt-5 text-sm font-semibold leading-6 ${plan.featured ? "text-[#4f6660]" : "text-white/65"}`}>{plan.description}</p>
@@ -410,7 +410,7 @@ export default function Home() {
           <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
               <SectionLabel>Demos enriquecidas</SectionLabel>
-              <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-black leading-none tracking-[-0.04em] md:text-6xl">
+              <h2 className="mt-4 text-balance font-[family-name:var(--font-display)] text-[clamp(2.35rem,10vw,4rem)] font-black leading-none tracking-[-0.04em] md:text-6xl">
                 Enséñales algo que parezca de su propio negocio.
               </h2>
             </div>
@@ -431,7 +431,7 @@ export default function Home() {
                 <div className="p-6">
                   <p className="text-xs font-black uppercase tracking-[0.2em] text-[#057564]">{demo.giro}</p>
                   <h3 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-black">{demo.name}</h3>
-                  <p className="mt-3 min-h-18 text-sm font-semibold leading-6 text-[#5d746f]">{demo.description}</p>
+                  <p className="mt-3 text-sm font-semibold leading-6 text-[#5d746f] md:min-h-18">{demo.description}</p>
                   <div className="mt-6 grid gap-2 sm:grid-cols-2">
                     <Link href={demo.menu} className="rounded-2xl bg-[#13201d] px-4 py-3 text-center text-sm font-black text-white transition hover:bg-[#203731]">
                       Ver menú
@@ -451,7 +451,7 @@ export default function Home() {
         <div className="mx-auto w-full max-w-7xl">
           <div className="max-w-3xl">
             <SectionLabel>Operación diaria</SectionLabel>
-            <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-black leading-none tracking-[-0.04em] md:text-6xl">
+            <h2 className="mt-4 text-balance font-[family-name:var(--font-display)] text-[clamp(2.35rem,10vw,4rem)] font-black leading-none tracking-[-0.04em] md:text-6xl">
               Del antojo del cliente al corte de caja.
             </h2>
           </div>
@@ -480,7 +480,7 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-7xl gap-8 rounded-[2.5rem] border border-[#13201d]/10 bg-white p-6 shadow-2xl shadow-[#13201d]/10 md:p-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div>
             <SectionLabel>Personalización</SectionLabel>
-            <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-black leading-none tracking-[-0.04em] md:text-6xl">
+            <h2 className="mt-4 text-balance font-[family-name:var(--font-display)] text-[clamp(2.35rem,10vw,4rem)] font-black leading-none tracking-[-0.04em] md:text-6xl">
               Un menú no debe verse igual para una taquería que para un café.
             </h2>
             <p className="mt-5 text-base font-semibold leading-8 text-[#49635d]">
@@ -511,7 +511,7 @@ export default function Home() {
           <div className="grid gap-8 p-8 md:p-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.28em] text-[#9cf2df]">Implementación local</p>
-              <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl font-black leading-none tracking-[-0.04em] md:text-6xl">
+              <h2 className="mt-4 text-balance font-[family-name:var(--font-display)] text-[clamp(2.35rem,10vw,4rem)] font-black leading-none tracking-[-0.04em] md:text-6xl">
                 Creado por Rafael Noh para vender tecnología útil en Playa del Carmen y México.
               </h2>
               <p className="mt-5 max-w-3xl text-base font-semibold leading-8 text-white/65">

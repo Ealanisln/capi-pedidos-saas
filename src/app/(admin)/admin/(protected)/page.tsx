@@ -96,17 +96,17 @@ export default async function AdminHomePage() {
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20">
-        <div className="bg-[radial-gradient(circle_at_top_right,#2dd4bf,transparent_28%),linear-gradient(135deg,#020617,#111827)] p-7">
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-teal-300">Resumen operativo</p>
+      <section className="overflow-hidden rounded-[1.5rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20 sm:rounded-[2rem]">
+        <div className="bg-[radial-gradient(circle_at_top_right,#2dd4bf,transparent_28%),linear-gradient(135deg,#020617,#111827)] p-5 sm:p-7">
+          <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-teal-300 sm:text-xs sm:tracking-[0.24em]">Resumen operativo</p>
           <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h2 className="text-4xl font-black tracking-tight">{tenant?.businessName ?? "Negocio"}</h2>
-              <p className="mt-2 text-sm text-slate-300">URL pública: /{tenant?.slug ?? "sin-slug"}</p>
+            <div className="min-w-0">
+              <h2 className="break-words text-3xl font-black tracking-tight sm:text-4xl">{tenant?.businessName ?? "Negocio"}</h2>
+              <p className="mt-2 break-all text-sm text-slate-300">URL pública: /{tenant?.slug ?? "sin-slug"}</p>
             </div>
             <Link
               href={`/${tenant?.slug ?? "capi"}`}
-              className="w-fit rounded-2xl bg-teal-300 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-teal-200"
+              className="w-full rounded-2xl bg-teal-300 px-5 py-3 text-center text-sm font-black text-slate-950 transition hover:bg-teal-200 sm:w-fit"
             >
               Ver menú público
             </Link>
@@ -139,7 +139,7 @@ export default async function AdminHomePage() {
 
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <h2 className="text-xl font-black text-slate-950">Productos con más movimiento</h2>
             <Link href="/admin/products" className="text-sm font-black text-teal-700">Editar</Link>
           </div>
@@ -148,8 +148,8 @@ export default async function AdminHomePage() {
               <p className="text-sm text-slate-600">Aún no hay datos suficientes.</p>
             ) : (
               topProducts.map(([name, data], index) => (
-                <div key={name} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                  <div>
+                <div key={name} className="flex flex-col gap-2 rounded-2xl bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
                     <p className="text-sm font-black text-slate-900">{index + 1}. {name}</p>
                     <p className="text-xs text-slate-500">{formatMoney(data.total)}</p>
                   </div>
@@ -163,7 +163,7 @@ export default async function AdminHomePage() {
         </article>
 
         <article className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <h2 className="text-xl font-black text-slate-950">Últimos cortes de caja</h2>
             <Link href="/admin/cash" className="text-sm font-black text-teal-700">Ir a caja</Link>
           </div>
@@ -172,7 +172,7 @@ export default async function AdminHomePage() {
               <p className="text-sm text-slate-600">Aún no hay cortes registrados.</p>
             ) : (
               cashCuts.slice(0, 6).map((cut) => (
-                <div key={cut.id} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
+                <div key={cut.id} className="flex flex-col gap-2 rounded-2xl bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-black text-slate-900">{cut.closedAt.toLocaleDateString("es-MX")}</p>
                     <p className="text-xs text-slate-500">Diferencia {formatMoney(cut.difference)}</p>
@@ -212,19 +212,19 @@ export default async function AdminHomePage() {
 
       <section className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5">
         <h2 className="text-xl font-black text-slate-950">Atajos</h2>
-        <div className="mt-4 flex flex-wrap gap-3">
+          <div className="mt-4 grid gap-3 sm:flex sm:flex-wrap">
           {[
             ["Gestionar categorías", "/admin/categories"],
             ["Gestionar productos", "/admin/products"],
             ["Gestionar pedidos", "/admin/orders"],
             ["Monitor cocina", "/admin/kitchen"],
           ].map(([label, href]) => (
-            <Link key={href} href={href} className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-black text-white transition hover:bg-slate-800">
+            <Link key={href} href={href} className="rounded-2xl bg-slate-950 px-4 py-3 text-center text-sm font-black text-white transition hover:bg-slate-800">
               {label}
             </Link>
           ))}
           {session.user.role === UserRole.SUPER_ADMIN ? (
-            <Link href="/admin/tenants" className="rounded-2xl bg-teal-600 px-4 py-3 text-sm font-black text-white transition hover:bg-teal-500">
+            <Link href="/admin/tenants" className="rounded-2xl bg-teal-600 px-4 py-3 text-center text-sm font-black text-white transition hover:bg-teal-500">
               Gestionar negocios SaaS
             </Link>
           ) : null}
