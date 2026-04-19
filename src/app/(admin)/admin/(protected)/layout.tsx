@@ -34,6 +34,7 @@ export default async function AdminLayout({
     { href: "/admin/orders", label: "Pedidos" },
     { href: "/admin/kitchen", label: "Cocina" },
     { href: "/admin/cash", label: "Caja" },
+    { href: "/admin/print", label: "Impresión" },
     { href: "/admin/settings", label: "Configuración" },
     ...(session.user.role === UserRole.SUPER_ADMIN
       ? [{ href: "/admin/tenants", label: "Negocios SaaS" }]

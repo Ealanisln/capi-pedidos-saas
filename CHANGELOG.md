@@ -1,5 +1,14 @@
 ﻿# Changelog
 
+## v0.095 - Cola de impresion y puente local
+
+- Cola de trabajos de impresion por restaurante para tickets de venta y produccion.
+- API protegida `/api/print/jobs` para que un puente local consulte, tome y confirme trabajos.
+- Pantalla administrativa `/admin/print` para revisar trabajos pendientes, impresos, fallidos y cancelados.
+- Generacion automatica de trabajos de produccion al recibir un pedido nuevo.
+- Generacion automatica de ticket de venta cuando caja marca un pedido como pagado.
+- Preparacion para conectar impresoras termicas por area: cocina, barra y caja.
+- Documentacion tecnica y manual de uso actualizados con el flujo de impresion automatica.
 ## v0.094 - Tickets térmicos de venta y producción
 
 - Tickets imprimibles por pedido desde el panel administrador.
@@ -32,5 +41,6 @@
 - Seeds demo realistas para negocios de comida en Mexico.
 - Documentacion tecnica, manual de uso, guia de contribucion y seguridad.
 - Sanitizacion de credenciales para repositorio publico.
+
 
 

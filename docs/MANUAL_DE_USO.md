@@ -398,3 +398,64 @@ Ejemplo:
 La primera versión imprime usando el navegador. Esto funciona con impresoras USB, Bluetooth o red siempre que el equipo del restaurante ya pueda imprimir desde Windows, macOS, Linux, Android o iPad.
 
 Para impresión automática directa tipo ESC/POS se recomienda una segunda fase con un puente local instalado en el restaurante.
+
+## 11. Cola de impresión automática
+
+Ruta: `/admin/print`
+
+Esta pantalla muestra los trabajos de impresión preparados para una app local de impresión.
+
+### Cuándo se generan trabajos
+
+- Al entrar un pedido nuevo, Capi genera tickets de producción por área según las categorías del pedido.
+- Al marcar un pedido como pagado, Capi genera ticket de venta para caja.
+
+### Estados
+
+| Estado | Significado |
+|---|---|
+| Pendiente | El ticket está esperando ser tomado. |
+| Tomado por puente | La app local ya lo consultó. |
+| Impreso | La app local confirmó impresión. |
+| Falló | La app local reportó error. |
+| Cancelado | Trabajo descartado manualmente o por regla futura. |
+
+### Áreas
+
+Las áreas vienen de `/admin/categories`:
+
+- General.
+- Cocina.
+- Barra.
+- Caja.
+
+### Conexión futura con impresoras
+
+La app local del restaurante consultará:
+
+```text
+GET /api/print/jobs?tenantSlug=mi_negocio&area=COCINA
+Authorization: Bearer TU_PRINT_BRIDGE_TOKEN
+```
+
+Después de imprimir, reportará:
+
+```text
+POST /api/print/jobs
+Authorization: Bearer TU_PRINT_BRIDGE_TOKEN
+
+{
+  "jobId": "id_del_trabajo",
+  "status": "PRINTED"
+}
+```
+
+Si falla:
+
+```text
+{
+  "jobId": "id_del_trabajo",
+  "status": "FAILED",
+  "error": "Impresora sin papel"
+}
+```

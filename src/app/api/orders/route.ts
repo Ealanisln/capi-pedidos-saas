@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { createProductionPrintJobs } from "@/lib/print-jobs";
 import { buildWhatsappMessage } from "@/lib/whatsapp";
 
 const itemSchema = z.object({
@@ -150,6 +151,8 @@ export async function POST(request: Request) {
         specialNotes: item.specialNotes,
       })),
     });
+
+    await createProductionPrintJobs(order.id);
 
     return NextResponse.json({
       ok: true,

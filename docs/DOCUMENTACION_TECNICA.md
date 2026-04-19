@@ -285,3 +285,74 @@ Opciones futuras:
 - Integración con impresoras de red por IP local.
 - WebUSB/WebBluetooth cuando el navegador/equipo lo permita.
 - Cola de impresión por áreas: cocina, barra y caja.
+
+## 17. Cola de impresión y puente local
+
+La versión `v0.095` agrega infraestructura de cola para impresión automática.
+
+### Modelos
+
+- `PrintJob`: trabajo de impresión por pedido.
+- `PrintJobType`: `SALE` o `PRODUCTION`.
+- `PrintJobStatus`: `PENDING`, `CLAIMED`, `PRINTED`, `FAILED`, `CANCELLED`.
+- `PrinterArea`: `GENERAL`, `COCINA`, `BARRA`, `CAJA`.
+
+### Generación de trabajos
+
+- `createProductionPrintJobs(orderId)`: se ejecuta cuando se crea un pedido público.
+- `createSalePrintJob(orderId)`: se ejecuta cuando caja marca un pedido como pagado.
+
+### API para puente local
+
+Endpoint:
+
+```text
+GET /api/print/jobs?tenantSlug=<slug>&area=<AREA>&limit=10
+Authorization: Bearer <PRINT_BRIDGE_TOKEN>
+```
+
+Respuesta:
+
+- Lista trabajos pendientes/fallidos.
+- Los marca como `CLAIMED`.
+- Devuelve `ticketUrl` para abrir/renderizar el ticket.
+
+Confirmación:
+
+```text
+POST /api/print/jobs
+Authorization: Bearer <PRINT_BRIDGE_TOKEN>
+Content-Type: application/json
+
+{
+  "jobId": "...",
+  "status": "PRINTED"
+}
+```
+
+Fallo:
+
+```json
+{
+  "jobId": "...",
+  "status": "FAILED",
+  "error": "Impresora desconectada"
+}
+```
+
+### Seguridad
+
+- Requiere `PRINT_BRIDGE_TOKEN`.
+- El token debe ser fuerte y vivir sólo en variables de entorno.
+- En una siguiente fase conviene tokens por tenant/estación en vez de token global.
+
+### Siguiente fase técnica
+
+Crear `Capi Print Bridge`, una app local que:
+
+1. Se instala en la computadora/tablet del restaurante.
+2. Guarda `tenantSlug`, área e impresora local.
+3. Consulta `/api/print/jobs` cada pocos segundos.
+4. Descarga/renderiza el ticket.
+5. Imprime por ESC/POS, impresora del sistema o navegador local.
+6. Reporta `PRINTED` o `FAILED`.

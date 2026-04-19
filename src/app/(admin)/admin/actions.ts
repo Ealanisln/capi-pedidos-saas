@@ -14,6 +14,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { requireAuthSession } from "@/lib/auth";
 import { resetDemoTenantData } from "@/lib/demo-reset";
+import { createSalePrintJob } from "@/lib/print-jobs";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/tenant";
 
@@ -380,7 +381,7 @@ export async function markOrderPaidAction(formData: FormData) {
   const method = parsePaymentMethod(String(formData.get("paymentMethod") ?? "EFECTIVO"));
   if (!orderId) return;
 
-  await prisma.order.updateMany({
+  const result = await prisma.order.updateMany({
     where: {
       id: orderId,
       tenantId: session.user.tenantId,
@@ -392,8 +393,13 @@ export async function markOrderPaidAction(formData: FormData) {
     },
   });
 
+  if (result.count > 0) {
+    await createSalePrintJob(orderId);
+  }
+
   revalidatePath("/admin/cash");
   revalidatePath("/admin/orders");
+  revalidatePath("/admin/print");
 }
 
 export async function markOrderUnpaidAction(formData: FormData) {
