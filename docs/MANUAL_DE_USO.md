@@ -311,3 +311,90 @@ Si. Si no configuras redes en ajustes, no se muestran botones.
 ### Los datos demo se reinician?
 
 Si. Los tenants demo tienen configuracion de reinicio automatico y tambien pueden reiniciarse manualmente.
+
+## 10. Tickets de venta y producción
+
+Capi permite imprimir tickets desde el panel administrador usando el navegador.
+
+### Ticket de venta
+
+Se usa para caja o comprobante del cliente.
+
+Incluye:
+
+- Nombre del negocio.
+- Número de pedido.
+- Fecha y hora.
+- Cliente y teléfono si existen.
+- Tipo de servicio: mesa, mostrador, recoger o domicilio.
+- Productos, cantidades, extras y notas.
+- Subtotal y total.
+- Estado de pago.
+- Mensaje de agradecimiento.
+- Mensaje de propina.
+- WiFi si está configurado.
+- Redes sociales si están activadas.
+
+Se puede abrir desde:
+
+- `/admin/orders`
+- `/admin/cash`
+
+### Ticket de producción
+
+Se usa cuando no hay monitor de cocina o cuando cocina/barra necesitan papel.
+
+Incluye:
+
+- Número de pedido.
+- Cliente.
+- Tipo de servicio.
+- Mesa o referencia.
+- Notas del cliente.
+- Productos filtrados por área.
+- Modificadores, rellenos y notas por producto.
+
+Se puede abrir desde:
+
+- `/admin/orders`
+- `/admin/kitchen`
+
+### Configuración
+
+Ruta: `/admin/settings`
+
+El restaurante puede configurar:
+
+- Ancho de ticket: 80mm o 58mm.
+- Mensaje de agradecimiento.
+- Mensaje de producción.
+- Mensaje de propina.
+- Nombre y clave de WiFi.
+- Mostrar u ocultar redes sociales.
+
+### Ruteo por categoría
+
+Ruta: `/admin/categories`
+
+Cada categoría puede asignarse a:
+
+- General.
+- Cocina.
+- Barra.
+- Caja.
+
+Ejemplo:
+
+| Categoría | Área sugerida |
+|---|---|
+| Tacos | Cocina |
+| Hamburguesas | Cocina |
+| Bebidas | Barra |
+| Postres | Cocina |
+| Promociones de caja | Caja |
+
+### Impresoras térmicas
+
+La primera versión imprime usando el navegador. Esto funciona con impresoras USB, Bluetooth o red siempre que el equipo del restaurante ya pueda imprimir desde Windows, macOS, Linux, Android o iPad.
+
+Para impresión automática directa tipo ESC/POS se recomienda una segunda fase con un puente local instalado en el restaurante.

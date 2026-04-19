@@ -1,6 +1,14 @@
-﻿import { requireAuthSession } from "@/lib/auth";
+﻿import { PrinterArea } from "@prisma/client";
+import { requireAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createCategoryAction, deleteCategoryAction, updateCategoryAction } from "../../actions";
+
+const printerAreaLabel: Record<PrinterArea, string> = {
+  GENERAL: "General",
+  COCINA: "Cocina",
+  BARRA: "Barra",
+  CAJA: "Caja",
+};
 
 export default async function CategoriesPage() {
   const session = await requireAuthSession();
@@ -12,14 +20,22 @@ export default async function CategoriesPage() {
   return (
     <div className="space-y-6">
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="text-xl font-semibold text-slate-900">Nueva categoria</h2>
-        <form action={createCategoryAction} className="mt-4 flex flex-col gap-3 md:flex-row">
+        <h2 className="text-xl font-semibold text-slate-900">Nueva categoría</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Elige también a qué área debe imprimirse esta categoría cuando se genere ticket de producción.
+        </p>
+        <form action={createCategoryAction} className="mt-4 grid gap-3 md:grid-cols-[1fr_220px_auto]">
           <input
             required
             name="name"
             placeholder="Ej. Antojitos"
             className="w-full rounded-lg border border-slate-300 px-3 py-2"
           />
+          <select name="printerArea" defaultValue="COCINA" className="rounded-lg border border-slate-300 px-3 py-2">
+            {Object.values(PrinterArea).map((area) => (
+              <option key={area} value={area}>{printerAreaLabel[area]}</option>
+            ))}
+          </select>
           <button className="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white">
             Crear
           </button>
@@ -38,19 +54,29 @@ export default async function CategoriesPage() {
                 className="rounded-lg border border-slate-200 px-3 py-3"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-medium text-slate-900">{category.name}</p>
-                  <p className="text-xs text-slate-500">{category.slug}</p>
+                  <div>
+                    <p className="font-medium text-slate-900">{category.name}</p>
+                    <p className="text-xs text-slate-500">{category.slug}</p>
+                  </div>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">
+                    Imprime en: {printerAreaLabel[category.printerArea]}
+                  </span>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  <form action={updateCategoryAction} className="flex flex-wrap gap-2">
+                  <form action={updateCategoryAction} className="grid w-full gap-2 md:grid-cols-[1fr_180px_auto]">
                     <input type="hidden" name="categoryId" value={category.id} />
                     <input
                       name="name"
                       defaultValue={category.name}
                       className="rounded-lg border border-slate-300 px-2 py-1 text-sm"
                     />
+                    <select name="printerArea" defaultValue={category.printerArea} className="rounded-lg border border-slate-300 px-2 py-1 text-sm">
+                      {Object.values(PrinterArea).map((area) => (
+                        <option key={area} value={area}>{printerAreaLabel[area]}</option>
+                      ))}
+                    </select>
                     <button className="rounded-lg bg-slate-900 px-3 py-1 text-sm text-white">
-                      Renombrar
+                      Guardar
                     </button>
                   </form>
                   <form action={deleteCategoryAction}>

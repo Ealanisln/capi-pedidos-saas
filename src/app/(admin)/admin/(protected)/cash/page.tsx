@@ -1,4 +1,5 @@
 ﻿import { PaymentMethod, PaymentStatus, ServiceType } from "@prisma/client";
+import Link from "next/link";
 import { requireAuthSession } from "@/lib/auth";
 import { formatMoney, formatNumber } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -197,6 +198,20 @@ export default async function CashPage() {
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-2">
+                  <Link
+                    href={`/admin/orders/${order.id}/ticket?type=sale`}
+                    target="_blank"
+                    className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700"
+                  >
+                    Ticket venta
+                  </Link>
+                  <Link
+                    href={`/admin/orders/${order.id}/ticket?type=sale`}
+                    target="_blank"
+                    className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700"
+                  >
+                    Ticket venta
+                  </Link>
                   {order.paymentStatus === PaymentStatus.PAGADO ? (
                     <form action={markOrderUnpaidAction}>
                       <input type="hidden" name="orderId" value={order.id} />
@@ -224,3 +239,6 @@ export default async function CashPage() {
     </div>
   );
 }
+
+
+

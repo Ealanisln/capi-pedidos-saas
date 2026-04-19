@@ -240,3 +240,48 @@ Lee también:
 
 - [Guía de agentes IA](./AGENTES_IA.md)
 - [Guía de vibecoding](./GUIA_VIBECODING.md)
+
+## 16. Tickets térmicos
+
+La versión `v0.094` agrega tickets imprimibles desde navegador para venta y producción.
+
+### Modelado
+
+- `Settings.ticketPaperWidth`: define 80mm o 58mm.
+- `Settings.saleTicketMessage`: mensaje de venta.
+- `Settings.productionTicketMessage`: mensaje interno para producción.
+- `Settings.ticketTipMessage`: mensaje opcional de propina.
+- `Settings.ticketWifiName`: nombre de red WiFi.
+- `Settings.ticketWifiPassword`: clave WiFi.
+- `Settings.showSocialsOnTicket`: muestra/oculta redes en ticket de venta.
+- `Category.printerArea`: área de impresión por categoría.
+
+### Ruta
+
+`/admin/orders/[orderId]/ticket`
+
+Parámetros:
+
+| Parámetro | Uso |
+|---|---|
+| `type=sale` | Ticket de venta. |
+| `type=production` | Ticket de producción. |
+| `area=COCINA` | Filtra productos de cocina. |
+| `area=BARRA` | Filtra productos de barra. |
+| `area=CAJA` | Filtra productos de caja. |
+
+### Impresión actual
+
+La impresión usa `window.print()` y CSS `@page` para 58mm/80mm. Es compatible con cualquier impresora que el sistema operativo ya reconozca.
+
+### Segunda fase recomendada
+
+Para impresión automática silenciosa se requiere un puente local porque Vercel no puede conectarse directamente a impresoras dentro de la red del restaurante.
+
+Opciones futuras:
+
+- App local Node.js/Electron con ESC/POS.
+- Servicio local en Windows que consulte pedidos pendientes.
+- Integración con impresoras de red por IP local.
+- WebUSB/WebBluetooth cuando el navegador/equipo lo permita.
+- Cola de impresión por áreas: cocina, barra y caja.

@@ -5,7 +5,9 @@ import {
   PaymentMethod,
   PaymentStatus,
   Prisma,
+  PrinterArea,
   PublicTemplate,
+  TicketPaperWidth,
   UserRole,
   Version,
 } from "@prisma/client";
@@ -44,10 +46,23 @@ function parsePaymentMethod(value: string): PaymentMethod {
   return PaymentMethod.EFECTIVO;
 }
 
+function parsePrinterArea(value: string): PrinterArea {
+  if (value === "GENERAL") return PrinterArea.GENERAL;
+  if (value === "BARRA") return PrinterArea.BARRA;
+  if (value === "CAJA") return PrinterArea.CAJA;
+  return PrinterArea.COCINA;
+}
+
+function parseTicketPaperWidth(value: string): TicketPaperWidth {
+  if (value === "MM_58") return TicketPaperWidth.MM_58;
+  return TicketPaperWidth.MM_80;
+}
+
 export async function createCategoryAction(formData: FormData) {
   const session = await requireAuthSession();
 
   const name = String(formData.get("name") ?? "").trim();
+  const printerArea = parsePrinterArea(String(formData.get("printerArea") ?? "COCINA"));
   if (!name) return;
 
   const count = await prisma.category.count({
@@ -60,6 +75,7 @@ export async function createCategoryAction(formData: FormData) {
       name,
       slug: slugify(name),
       position: count + 1,
+      printerArea,
     },
   });
 
@@ -71,11 +87,12 @@ export async function updateCategoryAction(formData: FormData) {
   const session = await requireAuthSession();
   const categoryId = String(formData.get("categoryId") ?? "");
   const name = String(formData.get("name") ?? "").trim();
+  const printerArea = parsePrinterArea(String(formData.get("printerArea") ?? "COCINA"));
   if (!categoryId || !name) return;
 
   await prisma.category.updateMany({
     where: { id: categoryId, tenantId: session.user.tenantId },
-    data: { name },
+    data: { name, printerArea },
   });
 
   revalidatePath("/admin/categories");
@@ -508,6 +525,13 @@ export async function updateTenantSettingsAction(formData: FormData) {
   const instagramUrl = String(formData.get("instagramUrl") ?? "").trim();
   const tiktokUrl = String(formData.get("tiktokUrl") ?? "").trim();
   const websiteUrl = String(formData.get("websiteUrl") ?? "").trim();
+  const saleTicketMessage = String(formData.get("saleTicketMessage") ?? "").trim();
+  const productionTicketMessage = String(formData.get("productionTicketMessage") ?? "").trim();
+  const ticketTipMessage = String(formData.get("ticketTipMessage") ?? "").trim();
+  const ticketWifiName = String(formData.get("ticketWifiName") ?? "").trim();
+  const ticketWifiPassword = String(formData.get("ticketWifiPassword") ?? "").trim();
+  const showSocialsOnTicket = String(formData.get("showSocialsOnTicket") ?? "") === "on";
+  const ticketPaperWidth = parseTicketPaperWidth(String(formData.get("ticketPaperWidth") ?? "MM_80"));
   const publicTemplateRaw = String(formData.get("publicTemplate") ?? "CLASICO");
   const publicTemplate = parsePublicTemplate(publicTemplateRaw);
 
@@ -523,6 +547,13 @@ export async function updateTenantSettingsAction(formData: FormData) {
     update: {
       welcomeMessage: welcomeMessage || null,
       publicTemplate,
+      ticketPaperWidth,
+      saleTicketMessage: saleTicketMessage || null,
+      productionTicketMessage: productionTicketMessage || null,
+      ticketTipMessage: ticketTipMessage || null,
+      ticketWifiName: ticketWifiName || null,
+      ticketWifiPassword: ticketWifiPassword || null,
+      showSocialsOnTicket,
       facebookUrl: facebookUrl || null,
       instagramUrl: instagramUrl || null,
       tiktokUrl: tiktokUrl || null,
@@ -532,6 +563,13 @@ export async function updateTenantSettingsAction(formData: FormData) {
       tenantId,
       welcomeMessage: welcomeMessage || null,
       publicTemplate,
+      ticketPaperWidth,
+      saleTicketMessage: saleTicketMessage || null,
+      productionTicketMessage: productionTicketMessage || null,
+      ticketTipMessage: ticketTipMessage || null,
+      ticketWifiName: ticketWifiName || null,
+      ticketWifiPassword: ticketWifiPassword || null,
+      showSocialsOnTicket,
       facebookUrl: facebookUrl || null,
       instagramUrl: instagramUrl || null,
       tiktokUrl: tiktokUrl || null,

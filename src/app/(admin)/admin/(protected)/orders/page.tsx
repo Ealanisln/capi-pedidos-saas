@@ -1,4 +1,5 @@
 ﻿import { OrderStatus, PaymentStatus, ServiceType } from "@prisma/client";
+import Link from "next/link";
 import { requireAuthSession } from "@/lib/auth";
 import { formatMoney, formatNumber } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -174,6 +175,29 @@ export default async function OrdersPage() {
                     </button>
                   </form>
                 </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Link
+                    href={`/admin/orders/${order.id}/ticket?type=sale`}
+                    target="_blank"
+                    className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700"
+                  >
+                    Ticket venta
+                  </Link>
+                  <Link
+                    href={`/admin/orders/${order.id}/ticket?type=production&area=COCINA`}
+                    target="_blank"
+                    className="rounded-xl border border-amber-300 px-4 py-2 text-sm font-black text-amber-800"
+                  >
+                    Producción cocina
+                  </Link>
+                  <Link
+                    href={`/admin/orders/${order.id}/ticket?type=production&area=BARRA`}
+                    target="_blank"
+                    className="rounded-xl border border-sky-300 px-4 py-2 text-sm font-black text-sky-800"
+                  >
+                    Producción barra
+                  </Link>
+                </div>
 
                 <ul className="mt-4 grid gap-2 text-sm text-slate-700 md:grid-cols-2">
                   {order.items.map((item) => (
@@ -191,3 +215,5 @@ export default async function OrdersPage() {
     </div>
   );
 }
+
+
