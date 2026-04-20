@@ -297,7 +297,7 @@ export function MenuClient({
         <button
           type="button"
           onClick={() => openCustomize(product)}
-          className={`rounded-xl px-4 py-3 text-sm font-black ${template.primaryBtn}`}
+          className={`w-full whitespace-nowrap rounded-xl px-4 py-3 text-sm font-black sm:w-auto ${template.primaryBtn}`}
         >
           Personalizar
         </button>
@@ -308,7 +308,7 @@ export function MenuClient({
       <button
         type="button"
         onClick={() => addSimple(product)}
-        className={`rounded-xl px-4 py-3 text-sm font-black ${template.primaryBtn}`}
+        className={`w-full whitespace-nowrap rounded-xl px-4 py-3 text-sm font-black sm:w-auto ${template.primaryBtn}`}
       >
         Agregar
       </button>
@@ -316,11 +316,11 @@ export function MenuClient({
   }
 
   return (
-    <div className="relative grid gap-6 pb-24 lg:grid-cols-[2fr_1fr] lg:pb-0">
-      <section className="space-y-5">
+    <div className="relative grid min-w-0 gap-4 pb-28 sm:gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] lg:pb-0">
+      <section className="min-w-0 space-y-4 sm:space-y-5">
         {advanced ? (
-          <div className={`sticky top-3 z-20 rounded-2xl border p-3 shadow-lg shadow-slate-900/10 backdrop-blur ${template.panel}`}>
-            <div className="grid gap-2 md:grid-cols-[1fr_auto]">
+          <div className={`rounded-2xl border p-3 shadow-lg shadow-slate-900/10 backdrop-blur md:sticky md:top-3 md:z-20 ${template.panel}`}>
+            <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto]">
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
@@ -343,12 +343,12 @@ export function MenuClient({
           </div>
         ) : null}
 
-        <div className={`sticky ${advanced ? "top-24" : "top-3"} z-10 -mx-4 overflow-x-auto px-4 py-2 backdrop-blur lg:mx-0 lg:px-0`}>
-          <div className="flex min-w-max gap-2">
+        <div className={`${advanced ? "md:top-24" : "md:top-3"} z-10 -mx-4 overflow-x-auto px-4 py-2 backdrop-blur md:sticky lg:mx-0 lg:px-0`}>
+          <div className="flex min-w-max gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={() => setActiveCategory("all")}
-              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              className={`whitespace-nowrap rounded-full border px-3 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm ${
                 activeCategory === "all" ? template.primaryBtn : template.secondaryBtn
               }`}
             >
@@ -359,7 +359,7 @@ export function MenuClient({
                 key={category.id}
                 type="button"
                 onClick={() => setActiveCategory(category.name)}
-                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                className={`whitespace-nowrap rounded-full border px-3 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm ${
                   activeCategory === category.name ? template.primaryBtn : template.secondaryBtn
                 }`}
               >
@@ -371,7 +371,7 @@ export function MenuClient({
 
         {featuredProducts.length > 0 && activeCategory === "all" && search.trim().length === 0 ? (
           <article className="space-y-3">
-            <div className="flex items-end justify-between gap-3">
+            <div className="grid gap-3 sm:flex sm:items-end sm:justify-between">
               <div>
                 <p className={`text-xs font-black uppercase tracking-[0.2em] ${helperText}`}>Recomendados</p>
                 <h2 className={`text-2xl font-black ${titleText}`}>Favoritos de la casa</h2>
@@ -400,7 +400,7 @@ export function MenuClient({
                     </div>
                     <h3 className={`text-lg font-black ${titleText}`}>{product.name}</h3>
                     {product.description ? <p className={`mt-1 text-sm ${bodyText}`}>{product.description}</p> : null}
-                    <div className="mt-4 flex items-center justify-between gap-3">
+                    <div className="mt-4 grid gap-3 sm:flex sm:items-center sm:justify-between">
                       <p className={`text-base font-black ${template.priceText}`}>{formatMoney(product.price)}</p>
                       {renderProductAction(product)}
                     </div>
@@ -430,7 +430,7 @@ export function MenuClient({
         {grouped.map((category) => (
           <article key={category.id} className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <h2 className={`text-2xl font-black ${titleText}`}>{category.name}</h2>
+              <h2 className={`min-w-0 break-words text-2xl font-black ${titleText}`}>{category.name}</h2>
               <span className={`rounded-full px-3 py-1 text-xs font-bold ${template.accentPill}`}>
                 {formatNumber(category.products.length)} opciones
               </span>
@@ -438,13 +438,13 @@ export function MenuClient({
             <div className="grid gap-3">
               {category.products.map((product, productIndex) => (
                 <div key={product.id} className={`overflow-hidden rounded-2xl border ${template.productCard}`}>
-                  <div className="grid gap-4 p-4 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+                  <div className="grid min-w-0 gap-4 p-4 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center">
                     {advanced && product.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={product.imageUrl}
                         alt={product.name}
-                        className="h-24 w-24 rounded-2xl object-cover sm:h-28 sm:w-28"
+                        className="h-40 w-full rounded-2xl object-cover sm:h-44 md:h-28 md:w-28"
                       />
                     ) : null}
                     <div className="min-w-0">
@@ -465,7 +465,7 @@ export function MenuClient({
                           </span>
                         ) : null}
                       </div>
-                      <h3 className={`text-lg font-black ${titleText}`}>{product.name}</h3>
+                      <h3 className={`break-words text-lg font-black ${titleText}`}>{product.name}</h3>
                       {product.description ? (
                         <p className={`mt-1 text-sm leading-6 ${bodyText}`}>{product.description}</p>
                       ) : null}
@@ -502,17 +502,17 @@ export function MenuClient({
                               return (
                                 <label
                                   key={modifier.id}
-                                  className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm ${template.secondaryBtn}`}
+                                  className={`grid gap-2 rounded-xl border px-3 py-2 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center ${template.secondaryBtn}`}
                                 >
-                                  <span className="flex items-center gap-2">
+                                  <span className="flex min-w-0 items-center gap-2">
                                     <input
                                       type={group.allowMultiple ? "checkbox" : "radio"}
                                       checked={selected}
                                       onChange={() => toggleModifier(group, modifier.id)}
                                     />
-                                    {modifier.name}
+                                    <span className="min-w-0 break-words">{modifier.name}</span>
                                   </span>
-                                  <span className="font-semibold">+{formatMoney(modifier.price)}</span>
+                                  <span className="shrink-0 font-semibold">+{formatMoney(modifier.price)}</span>
                                 </label>
                               );
                             })}
@@ -525,7 +525,7 @@ export function MenuClient({
                         placeholder="Notas especiales (sin cebolla, bien cocido...)"
                         className={`min-h-20 w-full rounded-lg border px-3 py-2 text-sm ${template.input}`}
                       />
-                      <div className="flex flex-wrap gap-2">
+                      <div className="grid gap-2 sm:flex sm:flex-wrap">
                         <button
                           type="button"
                           onClick={() => addCustomized(product)}
@@ -550,7 +550,7 @@ export function MenuClient({
         ))}
       </section>
 
-      <aside id="pedido" className={`h-fit rounded-2xl border p-5 shadow-sm lg:sticky lg:top-4 ${template.panel}`}>
+      <aside id="pedido" className={`h-fit min-w-0 rounded-2xl border p-4 shadow-sm sm:p-5 lg:sticky lg:top-4 ${template.panel}`}>
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className={`text-xs font-black uppercase tracking-[0.2em] ${helperText}`}>Carrito</p>
@@ -659,11 +659,13 @@ export function MenuClient({
       {cartItemsCount > 0 ? (
         <a
           href="#pedido"
-          className={`fixed bottom-3 left-3 right-3 z-50 flex items-center justify-between rounded-2xl border px-4 py-3 shadow-2xl shadow-slate-900/30 lg:hidden ${template.panel}`}
+          className={`fixed bottom-3 left-3 right-3 z-50 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-2xl border px-3 py-3 shadow-2xl shadow-slate-900/30 sm:px-4 lg:hidden ${template.panel}`}
         >
-          <span className="text-sm font-black">{formatNumber(cartItemsCount)} productos</span>
-          <span className={`rounded-xl px-4 py-2 text-sm font-black ${template.primaryBtn}`}>
-            Ver pedido - {formatMoney(total)}
+          <span className="min-w-0 truncate text-sm font-black">
+            {formatNumber(cartItemsCount)} productos - {formatMoney(total)}
+          </span>
+          <span className={`whitespace-nowrap rounded-xl px-3 py-2 text-sm font-black sm:px-4 ${template.primaryBtn}`}>
+            Ver
           </span>
         </a>
       ) : null}

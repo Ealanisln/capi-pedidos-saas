@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.100 - Reparacion responsive iPhone 7 a iPad
+
+- Se revirtio el ajuste responsive v0.099 porque deformaba la landing, menus publicos y panel admin.
+- Menu publico: tarjetas de producto mas flexibles, imagenes adaptables, filtros menos invasivos y boton flotante de carrito compacto.
+- Landing: titulos, botones, tarjetas de demos y temas ajustados para 375px sin desbordar.
+- Admin: navegacion en grid para movil/tablet, barra de plan no fija en movil y formularios densos movidos a pantallas grandes.
+- Caja, impresion, productos, pedidos, reportes y tenants reducen columnas en iPad portrait para evitar campos comprimidos.
+- Validado con capturas locales en iPhone 7 (375x667) e iPad (768x1024), ademas de lint y build.
+
 ## v0.097 - Caja operativa, comandero y demos enriquecidos
 
 - Límites reales por plan para cajas, meseros, mesas y estaciones de impresión.
@@ -61,13 +70,6 @@
 - Seeds demo realistas para negocios de comida en Mexico.
 - Documentacion tecnica, manual de uso, guia de contribucion y seguridad.
 - Sanitizacion de credenciales para repositorio publico.
-
-## v0.099
-
-- Se mejoro el responsive design de landing page con titulos fluidos, CTAs de ancho completo en celular y tarjetas mas compactas.
-- Se mejoro el layout movil del panel admin con navegacion horizontal, contenido sin overflow y barra de plan no invasiva.
-- Se ajustaron formularios y acciones de caja, pedidos, productos, categorias y reportes para evitar desbordes en celular.
-- Se agregaron reglas globales de proteccion contra overflow horizontal en textos, codigos, inputs y botones.
 
 ## v0.098
 

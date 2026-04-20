@@ -1,4 +1,4 @@
-﻿import { OrderStatus, PaymentStatus, ServiceType } from "@prisma/client";
+import { OrderStatus, PaymentStatus, ServiceType } from "@prisma/client";
 import Link from "next/link";
 import { requireAuthSession } from "@/lib/auth";
 import { formatMoney, formatNumber } from "@/lib/format";
@@ -71,9 +71,9 @@ export default async function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-[1.5rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20 sm:rounded-[2rem]">
-        <div className="bg-[radial-gradient(circle_at_top_right,#38bdf8,transparent_28%),linear-gradient(135deg,#020617,#111827)] p-5 sm:p-7">
-          <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-sky-200 sm:text-xs sm:tracking-[0.24em]">Historial operativo</p>
+      <section className="overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20">
+        <div className="bg-[radial-gradient(circle_at_top_right,#38bdf8,transparent_28%),linear-gradient(135deg,#020617,#111827)] p-7">
+          <p className="text-xs font-black uppercase tracking-[0.14em] sm:tracking-[0.24em] text-sky-200">Historial operativo</p>
           <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Pedidos</h2>
@@ -87,7 +87,7 @@ export default async function OrdersPage() {
       </section>
 
       {hasAnalytics ? (
-        <section className="grid gap-4 md:grid-cols-4">
+        <section className="grid gap-4 lg:grid-cols-4">
           <article className="rounded-3xl bg-gradient-to-br from-emerald-700 to-teal-700 p-5 text-white shadow-xl shadow-slate-900/10">
             <p className="text-xs font-black uppercase tracking-[0.2em] opacity-80">Venta acumulada</p>
             <p className="mt-3 text-3xl font-black">{formatMoney(totalSales)}</p>
@@ -114,7 +114,7 @@ export default async function OrdersPage() {
       {hasAnalytics ? (
         <section className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5">
           <h2 className="text-xl font-black text-slate-950">Productos más vendidos</h2>
-          <div className="mt-4 grid gap-2 md:grid-cols-5">
+          <div className="mt-4 grid gap-2 xl:grid-cols-5">
             {topProducts.length === 0 ? (
               <p className="text-sm text-slate-600">No hay suficientes pedidos para mostrar ranking.</p>
             ) : (
@@ -139,7 +139,7 @@ export default async function OrdersPage() {
             orders.map((order) => (
               <article key={order.id} className="rounded-3xl border border-slate-200 bg-white p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-lg font-black text-slate-950">{order.orderNumber}</p>
                       <span className={`rounded-full px-3 py-1 text-xs font-black ${statusTone[order.status]}`}>
@@ -151,18 +151,18 @@ export default async function OrdersPage() {
                         {order.paymentStatus === PaymentStatus.PAGADO ? "Pagado" : "Pendiente"}
                       </span>
                     </div>
-                    <p className="mt-1 break-words text-sm text-slate-600">
+                    <p className="mt-1 text-sm text-slate-600">
                       {order.customerName || "Cliente"} - {serviceLabel[order.serviceType]}
                       {order.tableName ? ` - ${order.tableName}` : ""}
                     </p>
                     <p className="mt-1 text-sm font-black text-slate-950">{formatMoney(order.total)}</p>
                   </div>
-                  <form action={updateOrderStatusAction} className="grid w-full gap-2 sm:w-auto sm:grid-cols-[1fr_auto]">
+                  <form action={updateOrderStatusAction} className="flex items-center gap-2">
                     <input type="hidden" name="orderId" value={order.id} />
                     <select
                       name="status"
                       defaultValue={order.status}
-                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                      className="rounded-xl border border-slate-300 px-3 py-2 text-sm"
                     >
                       {statuses.map((status) => (
                         <option key={status} value={status}>
@@ -175,25 +175,25 @@ export default async function OrdersPage() {
                     </button>
                   </form>
                 </div>
-                <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <Link
                     href={`/admin/orders/${order.id}/ticket?type=sale`}
                     target="_blank"
-                    className="rounded-xl border border-slate-300 px-4 py-2 text-center text-sm font-black text-slate-700"
+                    className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700"
                   >
                     Ticket venta
                   </Link>
                   <Link
                     href={`/admin/orders/${order.id}/ticket?type=production&area=COCINA`}
                     target="_blank"
-                    className="rounded-xl border border-amber-300 px-4 py-2 text-center text-sm font-black text-amber-800"
+                    className="rounded-xl border border-amber-300 px-4 py-2 text-sm font-black text-amber-800"
                   >
                     Producción cocina
                   </Link>
                   <Link
                     href={`/admin/orders/${order.id}/ticket?type=production&area=BARRA`}
                     target="_blank"
-                    className="rounded-xl border border-sky-300 px-4 py-2 text-center text-sm font-black text-sky-800"
+                    className="rounded-xl border border-sky-300 px-4 py-2 text-sm font-black text-sky-800"
                   >
                     Producción barra
                   </Link>
@@ -215,5 +215,3 @@ export default async function OrdersPage() {
     </div>
   );
 }
-
-

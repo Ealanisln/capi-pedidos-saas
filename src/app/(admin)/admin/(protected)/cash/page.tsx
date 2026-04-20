@@ -130,8 +130,8 @@ export default async function CashPage() {
   return (
     <div className="space-y-6">
       <section className="overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20">
-        <div className="bg-[radial-gradient(circle_at_top_right,#34d399,transparent_26%),linear-gradient(135deg,#020617,#111827)] p-5 sm:p-7">
-          <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-emerald-300 sm:text-xs sm:tracking-[0.24em]">Cobros del dia</p>
+        <div className="bg-[radial-gradient(circle_at_top_right,#34d399,transparent_26%),linear-gradient(135deg,#020617,#111827)] p-7">
+          <p className="text-xs font-black uppercase tracking-[0.14em] sm:tracking-[0.24em] text-emerald-300">Cobros del dia</p>
           <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Caja</h2>
@@ -146,7 +146,7 @@ export default async function CashPage() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid gap-4 lg:grid-cols-4">
         <MoneyCard label="Cobrado hoy" value={formatMoney(totalPaid)} helper={`${formatNumber(paidOrders.length)} pedidos pagados`} tone="from-emerald-700 to-teal-700 text-white" />
         <MoneyCard label="Pendiente de cobro" value={formatMoney(totalPending)} helper={`${formatNumber(pendingOrders.length)} pedidos pendientes`} tone="from-amber-400 to-orange-500 text-slate-950" />
         <MoneyCard label="Efectivo esperado" value={formatMoney(expectedCash)} helper={openSession ? openSession.drawer.name : "Sin caja abierta"} tone="from-slate-950 to-slate-800 text-white" />
@@ -161,7 +161,7 @@ export default async function CashPage() {
               {formatNumber(drawers.length)} / {formatNumber(tenant?.maxCashDrawers ?? limits.cashDrawers)}
             </span>
           </div>
-          <form action={createCashDrawerAction} className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto]">
+          <form action={createCashDrawerAction} className="mt-4 flex gap-2">
             <input name="name" placeholder="Ej. Caja mostrador" className="min-w-0 flex-1 rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
             <button className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-black text-white">Agregar</button>
           </form>
@@ -177,7 +177,7 @@ export default async function CashPage() {
                     </span>
                   </div>
                   {!active ? (
-                    <form action={openCashSessionAction} className="mt-3 grid gap-2 md:grid-cols-[1fr_1fr_auto]">
+                    <form action={openCashSessionAction} className="mt-3 grid gap-2 lg:grid-cols-[1fr_1fr_auto]">
                       <input type="hidden" name="drawerId" value={drawer.id} />
                       <input name="openingAmount" type="number" min="0" step="0.01" placeholder="Fondo inicial" className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
                       <input name="notes" placeholder="Notas" className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
@@ -208,7 +208,7 @@ export default async function CashPage() {
                 <p className="text-xs font-black uppercase tracking-[0.18em]">Esperado en cajon</p>
                 <p className="mt-2 text-3xl font-black">{formatMoney(expectedCash)}</p>
               </div>
-              <form action={createCashMovementAction} className="grid gap-2 rounded-3xl bg-slate-50 p-4 md:grid-cols-[150px_130px_1fr_1fr_auto]">
+              <form action={createCashMovementAction} className="grid gap-2 rounded-3xl bg-slate-50 p-4 xl:grid-cols-[150px_130px_minmax(0,1fr)_minmax(0,1fr)_auto]">
                 <input type="hidden" name="cashSessionId" value={openSession.id} />
                 <select name="type" defaultValue="SALIDA" className="rounded-xl border border-slate-300 px-3 py-2 text-sm">
                   {Object.values(CashMovementType).map((type) => <option key={type} value={type}>{movementLabel[type]}</option>)}
@@ -218,7 +218,7 @@ export default async function CashPage() {
                 <input name="reason" placeholder="Motivo obligatorio" className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
                 <button className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-black text-white">Guardar</button>
               </form>
-              <form action={closeCashSessionAction} className="grid gap-2 rounded-3xl border border-rose-200 bg-rose-50 p-4 md:grid-cols-[160px_1fr_auto]">
+              <form action={closeCashSessionAction} className="grid gap-2 rounded-3xl border border-rose-200 bg-rose-50 p-4 lg:grid-cols-[160px_minmax(0,1fr)_auto]">
                 <input type="hidden" name="cashSessionId" value={openSession.id} />
                 <input name="countedAmount" type="number" min="0" step="0.01" placeholder="Efectivo contado" className="rounded-xl border border-rose-200 px-3 py-2 text-sm" />
                 <input name="notes" placeholder="Notas de cierre" className="rounded-xl border border-rose-200 px-3 py-2 text-sm" />
@@ -280,14 +280,14 @@ export default async function CashPage() {
                   </span>
                 </div>
 
-                <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <Link href={`/admin/orders/${order.id}/ticket?type=sale`} target="_blank" className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700">Ticket venta</Link>
                   <form action={lockOrderForPrecheckAction}>
                     <input type="hidden" name="orderId" value={order.id} />
                     <button className="rounded-xl border border-amber-300 px-4 py-2 text-sm font-black text-amber-800">Imprimir precuenta</button>
                   </form>
                   {order.lockStatus !== OrderLockStatus.ABIERTA ? (
-                    <form action={unlockOrderAction} className="grid gap-2 sm:flex">
+                    <form action={unlockOrderAction} className="flex gap-2">
                       <input type="hidden" name="orderId" value={order.id} />
                       <input type="hidden" name="reason" value="Reapertura autorizada desde caja" />
                       <button className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700">Reabrir</button>
@@ -299,7 +299,7 @@ export default async function CashPage() {
                       <button className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-black text-slate-700">Marcar pendiente</button>
                     </form>
                   ) : (
-                    <form action={markOrderPaidAction} className="grid w-full gap-2 rounded-2xl bg-slate-50 p-2 md:grid-cols-2 xl:grid-cols-[130px_120px_120px_1fr_auto]">
+                    <form action={markOrderPaidAction} className="grid w-full gap-2 rounded-2xl bg-slate-50 p-2 xl:grid-cols-[130px_120px_120px_minmax(0,1fr)_auto]">
                       <input type="hidden" name="orderId" value={order.id} />
                       {openSession ? <input type="hidden" name="cashSessionId" value={openSession.id} /> : null}
                       <select name="paymentMethod" defaultValue="EFECTIVO" className="rounded-xl border border-slate-300 px-3 py-2 text-sm">
@@ -322,7 +322,7 @@ export default async function CashPage() {
         <h3 className="text-xl font-black text-slate-950">Ultimos turnos de caja</h3>
         <div className="mt-4 space-y-2">
           {recentSessions.map((cashSession) => (
-            <div key={cashSession.id} className="grid gap-2 rounded-2xl bg-slate-50 p-4 text-sm md:grid-cols-4">
+            <div key={cashSession.id} className="grid gap-2 rounded-2xl bg-slate-50 p-4 text-sm lg:grid-cols-4">
               <p className="font-black text-slate-950">{cashSession.drawer.name}</p>
               <p>{cashSession.openedAt.toLocaleString("es-MX")}</p>
               <p>{cashSession.status === CashSessionStatus.ABIERTA ? "Abierta" : "Cerrada"}</p>
@@ -334,4 +334,3 @@ export default async function CashPage() {
     </div>
   );
 }
-

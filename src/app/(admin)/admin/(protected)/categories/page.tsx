@@ -1,4 +1,4 @@
-﻿import { PrinterArea } from "@prisma/client";
+import { PrinterArea } from "@prisma/client";
 import { requireAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { assignCategoryPrinterStationAction, createCategoryAction, deleteCategoryAction, updateCategoryAction } from "../../actions";
@@ -29,7 +29,7 @@ export default async function CategoriesPage() {
         <p className="mt-1 text-sm text-slate-600">
           Elige también a qué área debe imprimirse esta categoría cuando se genere ticket de producción.
         </p>
-        <form action={createCategoryAction} className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_220px_auto]">
+        <form action={createCategoryAction} className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_auto]">
           <input
             required
             name="name"
@@ -41,7 +41,7 @@ export default async function CategoriesPage() {
               <option key={area} value={area}>{printerAreaLabel[area]}</option>
             ))}
           </select>
-          <button className="rounded-lg bg-slate-900 px-4 py-3 font-semibold text-white">
+          <button className="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white">
             Crear
           </button>
         </form>
@@ -58,17 +58,17 @@ export default async function CategoriesPage() {
                 key={category.id}
                 className="rounded-lg border border-slate-200 px-3 py-3"
               >
-                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-                  <div className="min-w-0">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
                     <p className="font-medium text-slate-900">{category.name}</p>
-                    <p className="break-all text-xs text-slate-500">{category.slug}</p>
+                    <p className="text-xs text-slate-500">{category.slug}</p>
                   </div>
-                  <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">
                     Imprime en: {category.printerStation?.name ?? printerAreaLabel[category.printerArea]}
                   </span>
                 </div>
                 <div className="mt-2 grid gap-2">
-                  <form action={updateCategoryAction} className="grid w-full gap-2 md:grid-cols-[minmax(0,1fr)_180px_auto]">
+                  <form action={updateCategoryAction} className="grid w-full gap-2 lg:grid-cols-[minmax(0,1fr)_180px_auto]">
                     <input type="hidden" name="categoryId" value={category.id} />
                     <input
                       name="name"
@@ -80,11 +80,11 @@ export default async function CategoriesPage() {
                         <option key={area} value={area}>{printerAreaLabel[area]}</option>
                       ))}
                     </select>
-                    <button className="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">
+                    <button className="rounded-lg bg-slate-900 px-3 py-1 text-sm text-white">
                       Guardar
                     </button>
                   </form>
-                  <form action={assignCategoryPrinterStationAction} className="grid w-full gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
+                  <form action={assignCategoryPrinterStationAction} className="grid w-full gap-2 lg:grid-cols-[minmax(0,1fr)_auto]">
                     <input type="hidden" name="categoryId" value={category.id} />
                     <select name="printerStationId" defaultValue={category.printerStationId ?? ""} className="rounded-lg border border-slate-300 px-2 py-1 text-sm">
                       <option value="">Usar área: {printerAreaLabel[category.printerArea]}</option>
@@ -94,13 +94,13 @@ export default async function CategoriesPage() {
                         </option>
                       ))}
                     </select>
-                    <button className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold text-slate-700">
+                    <button className="rounded-lg border border-slate-300 px-3 py-1 text-sm font-bold text-slate-700">
                       Asignar estación
                     </button>
                   </form>
                   <form action={deleteCategoryAction}>
                     <input type="hidden" name="categoryId" value={category.id} />
-                    <button className="w-full rounded-lg border border-rose-300 px-3 py-2 text-sm text-rose-700 sm:w-auto">
+                    <button className="rounded-lg border border-rose-300 px-3 py-1 text-sm text-rose-700">
                       Eliminar
                     </button>
                   </form>
@@ -113,4 +113,3 @@ export default async function CategoriesPage() {
     </div>
   );
 }
-

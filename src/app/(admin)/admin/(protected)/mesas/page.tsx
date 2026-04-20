@@ -28,8 +28,8 @@ export default async function MesasPage() {
   return (
     <div className="space-y-6">
       <section className="rounded-[2rem] bg-slate-950 p-7 text-white shadow-2xl shadow-slate-900/20">
-        <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-200">Comandero</p>
-        <h2 className="mt-2 text-4xl font-black">Mesas</h2>
+        <p className="text-xs font-black uppercase tracking-[0.14em] sm:tracking-[0.24em] text-cyan-200">Comandero</p>
+        <h2 className="mt-2 text-3xl font-black sm:text-4xl">Mesas</h2>
         <p className="mt-2 text-sm text-slate-300">Mapa operativo para meseros: mesas libres, ocupadas, en cocina y por cobrar.</p>
       </section>
       <section className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5">
@@ -60,4 +60,3 @@ export default async function MesasPage() {
     </div>
   );
 }
-

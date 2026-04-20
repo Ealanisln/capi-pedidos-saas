@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { UserRole } from "@prisma/client";
 import { requireAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -129,7 +129,7 @@ export default async function TenantsPage() {
                 ) : null}
               </div>
               <div className="space-y-2">
-                <form action={updateTenantPlanAction} className="grid w-full gap-2 md:grid-cols-4">
+                <form action={updateTenantPlanAction} className="grid w-full gap-2 lg:grid-cols-4">
                   <input type="hidden" name="tenantId" value={tenant.id} />
                   <select
                     name="version"
@@ -156,7 +156,7 @@ export default async function TenantsPage() {
                     Guardar plan y vigencia
                   </button>
                 </form>
-                <form action={updateTenantDemoSettingsAction} className="grid w-full gap-2 md:grid-cols-[auto_1fr_auto]">
+                <form action={updateTenantDemoSettingsAction} className="grid w-full gap-2 lg:grid-cols-[auto_minmax(0,1fr)_auto]">
                   <input type="hidden" name="tenantId" value={tenant.id} />
                   <label className="flex items-center gap-2 rounded-lg border border-slate-200 px-2 py-1 text-sm text-slate-700">
                     <input type="checkbox" name="isDemo" defaultChecked={tenant.isDemo} />

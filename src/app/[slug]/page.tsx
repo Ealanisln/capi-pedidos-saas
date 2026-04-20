@@ -51,28 +51,28 @@ export default async function TenantByPathPage({ params }: TenantPageProps) {
   const theme = getPublicTheme(tenant.settings?.publicTemplate);
 
   return (
-    <div className={`min-h-screen px-4 py-8 ${theme.page}`}>
-      <div className="mx-auto w-full max-w-6xl space-y-6">
-        <header className={`rounded-2xl p-6 shadow-sm ${theme.header}`}>
-          <p className={`text-xs uppercase tracking-wide ${theme.eyebrow}`}>
+    <div className={`min-h-screen px-3 py-4 sm:px-4 sm:py-8 ${theme.page}`}>
+      <div className="mx-auto w-full max-w-6xl space-y-4 sm:space-y-6">
+        <header className={`rounded-2xl p-4 shadow-sm sm:p-6 ${theme.header}`}>
+          <p className={`break-words text-[0.68rem] uppercase tracking-[0.12em] sm:text-xs sm:tracking-wide ${theme.eyebrow}`}>
             Menú digital de {tenant.businessName}
           </p>
-          <h1 className={`text-3xl font-bold ${theme.title}`}>
+          <h1 className={`break-words text-2xl font-bold sm:text-3xl ${theme.title}`}>
             {tenant.businessName}
           </h1>
           {tenant.settings?.welcomeMessage ? (
-            <p className={`mt-2 ${theme.body}`}>
+            <p className={`mt-2 break-words text-sm leading-6 sm:text-base ${theme.body}`}>
               {tenant.settings.welcomeMessage}
             </p>
           ) : null}
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             {tenant.settings?.facebookUrl ? (
               <Link
                 href={tenant.settings.facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`rounded-lg border px-3 py-1 text-sm ${theme.socialLink}`}
+                className={`rounded-lg border px-3 py-2 text-center text-sm ${theme.socialLink}`}
               >
                 Facebook
               </Link>
@@ -82,7 +82,7 @@ export default async function TenantByPathPage({ params }: TenantPageProps) {
                 href={tenant.settings.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`rounded-lg border px-3 py-1 text-sm ${theme.socialLink}`}
+                className={`rounded-lg border px-3 py-2 text-center text-sm ${theme.socialLink}`}
               >
                 Instagram
               </Link>
@@ -92,7 +92,7 @@ export default async function TenantByPathPage({ params }: TenantPageProps) {
                 href={tenant.settings.tiktokUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`rounded-lg border px-3 py-1 text-sm ${theme.socialLink}`}
+                className={`rounded-lg border px-3 py-2 text-center text-sm ${theme.socialLink}`}
               >
                 TikTok
               </Link>
@@ -102,7 +102,7 @@ export default async function TenantByPathPage({ params }: TenantPageProps) {
                 href={tenant.settings.websiteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`rounded-lg border px-3 py-1 text-sm ${theme.socialLink}`}
+                className={`rounded-lg border px-3 py-2 text-center text-sm ${theme.socialLink}`}
               >
                 Sitio web
               </Link>

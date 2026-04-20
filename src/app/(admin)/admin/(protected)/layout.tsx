@@ -45,19 +45,19 @@ export default async function AdminLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,#ccfbf1,transparent_26%),linear-gradient(135deg,#f8fafc,#fff7ed)] pb-6 md:pb-28">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,#ccfbf1,transparent_26%),linear-gradient(135deg,#f8fafc,#fff7ed)] lg:pb-28">
       <header className="bg-slate-950 text-white shadow-2xl shadow-slate-900/20">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-5 md:flex-row md:items-center md:justify-between">
           <div className="min-w-0">
-            <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-teal-300 sm:text-xs sm:tracking-[0.24em]">
+            <p className="text-[0.68rem] font-black uppercase tracking-[0.14em] text-teal-300 sm:text-xs sm:tracking-[0.24em]">
               Centro de control Capi
             </p>
-            <h1 className="mt-1 truncate text-xl font-black tracking-tight sm:text-2xl">
+            <h1 className="mt-1 truncate text-2xl font-black tracking-tight">
               {session.user.name ?? "Administrador"}
             </h1>
             <p className="mt-1 truncate text-sm text-slate-300">{session.user.email}</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center">
             <span className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-wide text-teal-100">
               Plan {tenant?.version ?? "LITE"}
             </span>
@@ -66,12 +66,12 @@ export default async function AdminLayout({
         </div>
       </header>
       <div className="mx-auto grid w-full max-w-7xl gap-4 px-3 py-4 sm:px-4 sm:py-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-6">
-        <nav className="flex gap-2 overflow-x-auto rounded-3xl border border-white/70 bg-white/85 p-2 shadow-xl shadow-slate-900/5 backdrop-blur lg:sticky lg:top-4 lg:block lg:h-fit lg:overflow-visible">
+        <nav className="grid h-fit grid-cols-2 gap-2 rounded-3xl border border-white/70 bg-white/85 p-2 shadow-xl shadow-slate-900/5 backdrop-blur sm:grid-cols-3 lg:sticky lg:top-4 lg:block">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="block shrink-0 rounded-2xl px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-950 hover:text-white"
+              className="block rounded-2xl px-3 py-3 text-center text-xs font-bold text-slate-700 transition hover:bg-slate-950 hover:text-white sm:text-sm lg:px-4 lg:text-left"
             >
               {link.label}
             </Link>
@@ -80,8 +80,8 @@ export default async function AdminLayout({
         <main className="min-w-0">{children}</main>
       </div>
       {tenant ? (
-        <div className="mx-3 mb-3 rounded-3xl border border-slate-200 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur md:fixed md:inset-x-0 md:bottom-0 md:z-40 md:mx-0 md:mb-0 md:rounded-none md:border-x-0 md:border-b-0">
-          <div className="mx-auto grid max-w-5xl gap-2 text-center text-xs text-slate-700 sm:text-sm md:flex md:items-center md:justify-center md:gap-4">
+        <div className="border-t border-slate-200 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur lg:fixed lg:inset-x-0 lg:bottom-0 lg:z-40">
+          <div className="mx-auto flex max-w-5xl flex-col items-center justify-center gap-2 text-center text-sm text-slate-700 md:flex-row md:gap-4">
             <span>
               Plan contratado: <strong>{tenant.version}</strong>
             </span>

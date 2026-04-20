@@ -1,4 +1,4 @@
-﻿import { OrderStatus, ServiceType } from "@prisma/client";
+import { OrderStatus, ServiceType } from "@prisma/client";
 import Link from "next/link";
 import { requireAuthSession } from "@/lib/auth";
 import { formatNumber } from "@/lib/format";
@@ -48,10 +48,10 @@ export default async function KitchenPage() {
     <div className="space-y-6">
       <section className="overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20">
         <div className="bg-[radial-gradient(circle_at_top_right,#facc15,transparent_28%),linear-gradient(135deg,#020617,#111827)] p-7">
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-200">Operación en vivo</p>
+          <p className="text-xs font-black uppercase tracking-[0.14em] sm:tracking-[0.24em] text-amber-200">Operación en vivo</p>
           <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="text-4xl font-black tracking-tight">Monitor de cocina</h2>
+              <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Monitor de cocina</h2>
               <p className="mt-2 text-sm text-slate-300">
                 Comandas activas para preparar, dar salida o cancelar sin perder visibilidad.
               </p>
@@ -159,6 +159,3 @@ export default async function KitchenPage() {
     </div>
   );
 }
-
-
-

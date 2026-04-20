@@ -1,4 +1,4 @@
-﻿import { PrintJobStatus, PrintJobType, PrinterArea } from "@prisma/client";
+import { PrintJobStatus, PrintJobType, PrinterArea } from "@prisma/client";
 import Link from "next/link";
 import { requireAuthSession } from "@/lib/auth";
 import { buildTicketPath } from "@/lib/print-jobs";
@@ -75,10 +75,10 @@ export default async function PrintPage() {
     <div className="space-y-6">
       <section className="overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20">
         <div className="bg-[radial-gradient(circle_at_top_right,#f97316,transparent_28%),linear-gradient(135deg,#020617,#111827)] p-7">
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-orange-200">Puente de impresión</p>
+          <p className="text-xs font-black uppercase tracking-[0.14em] sm:tracking-[0.24em] text-orange-200">Puente de impresión</p>
           <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="text-4xl font-black tracking-tight">Cola de tickets</h2>
+              <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Cola de tickets</h2>
               <p className="mt-2 text-sm text-slate-300">
                 Trabajos preparados para imprimir en caja, cocina o barra. Esta pantalla deja listo el flujo para un puente local ESC/POS.
               </p>
@@ -90,7 +90,7 @@ export default async function PrintPage() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-5">
+      <section className="grid gap-4 xl:grid-cols-5">
         {Object.values(PrintJobStatus).map((status) => (
           <article key={status} className="rounded-3xl bg-white p-5 shadow-xl shadow-slate-900/5">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{statusLabel[status]}</p>
@@ -123,7 +123,7 @@ export default async function PrintPage() {
           </span>
         </div>
 
-        <form action={createPrinterStationAction} className="mt-5 grid gap-3 rounded-3xl bg-slate-50 p-4 md:grid-cols-[1fr_160px_1fr_auto_auto]">
+        <form action={createPrinterStationAction} className="mt-5 grid gap-3 rounded-3xl bg-slate-50 p-4 xl:grid-cols-[minmax(0,1fr)_160px_minmax(0,1fr)_auto_auto]">
           <input name="name" placeholder="Nombre: Cocina caliente" className="rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
           <select name="area" defaultValue="COCINA" className="rounded-2xl border border-slate-300 px-4 py-3 text-sm">
             {areaOptions.map((area) => (
@@ -142,7 +142,7 @@ export default async function PrintPage() {
             <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">Aún no hay estaciones configuradas.</p>
           ) : (
             stations.map((station) => (
-              <form key={station.id} action={updatePrinterStationAction} className="grid gap-3 rounded-3xl border border-slate-200 bg-white p-4 md:grid-cols-[1fr_150px_1fr_auto_auto_auto]">
+              <form key={station.id} action={updatePrinterStationAction} className="grid gap-3 rounded-3xl border border-slate-200 bg-white p-4 xl:grid-cols-[minmax(0,1fr)_150px_minmax(0,1fr)_auto_auto_auto]">
                 <input type="hidden" name="stationId" value={station.id} />
                 <input name="name" defaultValue={station.name} className="rounded-2xl border border-slate-300 px-4 py-3 text-sm" />
                 <select name="area" defaultValue={station.area} className="rounded-2xl border border-slate-300 px-4 py-3 text-sm">

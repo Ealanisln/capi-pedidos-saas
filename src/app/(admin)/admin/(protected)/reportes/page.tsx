@@ -44,9 +44,9 @@ export default async function ReportesPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-[1.5rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20 sm:rounded-[2rem]">
-        <div className="bg-[radial-gradient(circle_at_top_right,#38bdf8,transparent_28%),linear-gradient(135deg,#020617,#0f172a)] p-5 sm:p-7">
-          <p className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-sky-300 sm:text-xs sm:tracking-[0.24em]">Excel, PowerBI y analisis</p>
+      <section className="overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-2xl shadow-slate-900/20">
+        <div className="bg-[radial-gradient(circle_at_top_right,#38bdf8,transparent_28%),linear-gradient(135deg,#020617,#0f172a)] p-7">
+          <p className="text-xs font-black uppercase tracking-[0.14em] sm:tracking-[0.24em] text-sky-300">Excel, PowerBI y analisis</p>
           <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Reportes conectables</h2>
           <p className="mt-2 max-w-3xl text-sm text-slate-300">
             Genera tokens por restaurante para que el negocio conecte sus ventas a Excel, PowerBI o herramientas de analisis sin compartir su usuario y contrasena.
@@ -61,7 +61,7 @@ export default async function ReportesPage({ searchParams }: PageProps) {
           <p className="mt-2 text-sm font-semibold text-emerald-900">
             Por seguridad solo se muestra una vez. Si lo pierdes, revoca el acceso y crea uno nuevo.
           </p>
-          <code className="mt-4 block overflow-x-auto break-all rounded-2xl bg-white p-4 text-xs font-black text-slate-950 sm:text-sm">
+          <code className="mt-4 block overflow-x-auto rounded-2xl bg-white p-4 text-sm font-black text-slate-950">
             {nuevoToken}
           </code>
         </section>
@@ -97,11 +97,11 @@ export default async function ReportesPage({ searchParams }: PageProps) {
           <div className="mt-4 space-y-3">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">CSV para Excel o PowerBI</p>
-              <code className="mt-2 block overflow-x-auto break-all rounded-2xl bg-slate-950 p-4 text-xs text-white">{sampleCsv}</code>
+              <code className="mt-2 block overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs text-white">{sampleCsv}</code>
             </div>
             <div>
               <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">JSON para integraciones</p>
-              <code className="mt-2 block overflow-x-auto break-all rounded-2xl bg-slate-950 p-4 text-xs text-white">{sampleJson}</code>
+              <code className="mt-2 block overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs text-white">{sampleJson}</code>
             </div>
           </div>
         </article>
@@ -114,10 +114,10 @@ export default async function ReportesPage({ searchParams }: PageProps) {
             <p className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-slate-600">Aun no hay tokens creados.</p>
           ) : (
             credentials.map((credential) => (
-              <article key={credential.id} className="grid gap-3 rounded-3xl border border-slate-200 bg-white p-4 lg:grid-cols-[minmax(0,1fr)_auto]">
-                <div className="min-w-0">
+              <article key={credential.id} className="grid gap-3 rounded-3xl border border-slate-200 bg-white p-4 lg:grid-cols-[1fr_auto]">
+                <div>
                   <p className="font-black text-slate-950">{credential.name}</p>
-                  <p className="break-all text-sm text-slate-600">
+                  <p className="text-sm text-slate-600">
                     Prefijo: <strong>{credential.tokenPrefix}...</strong> - Scope: {credential.scope}
                   </p>
                   <p className="text-xs text-slate-500">
@@ -148,7 +148,7 @@ export default async function ReportesPage({ searchParams }: PageProps) {
             <p className="text-sm text-slate-600">Sin consultas registradas.</p>
           ) : (
             auditLogs.map((log) => (
-              <div key={log.id} className="grid gap-2 rounded-2xl bg-slate-50 p-3 text-sm md:grid-cols-4">
+              <div key={log.id} className="grid gap-2 rounded-2xl bg-slate-50 p-3 text-sm lg:grid-cols-4">
                 <p className="font-black text-slate-950">{log.credential?.name ?? "Token eliminado"}</p>
                 <p>{log.format.toUpperCase()} - {log.scope === ExportScope.VENTAS ? "Ventas" : log.scope}</p>
                 <p>{formatNumber(log.rowCount)} registros</p>

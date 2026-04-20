@@ -1,4 +1,4 @@
-﻿import { UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import { requireAuthSession } from "@/lib/auth";
 import { formatNumber } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -13,8 +13,8 @@ export default async function MeserosPage() {
   return (
     <div className="space-y-6">
       <section className="rounded-[2rem] bg-slate-950 p-7 text-white shadow-2xl shadow-slate-900/20">
-        <p className="text-xs font-black uppercase tracking-[0.24em] text-lime-200">Equipo de servicio</p>
-        <h2 className="mt-2 text-4xl font-black">Meseros</h2>
+        <p className="text-xs font-black uppercase tracking-[0.14em] sm:tracking-[0.24em] text-lime-200">Equipo de servicio</p>
+        <h2 className="mt-2 text-3xl font-black sm:text-4xl">Meseros</h2>
         <p className="mt-2 text-sm text-slate-300">Usuarios con acceso limitado para levantar pedidos, enviar a cocina, imprimir precuentas y cobrar solo si el admin lo permite.</p>
       </section>
       <section className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5">
